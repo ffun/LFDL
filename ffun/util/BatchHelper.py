@@ -38,18 +38,13 @@ class BatchHelper(object):
         '''
         shuffle the m_items
         '''
+        self.reset_cursor()
         random.shuffle(self.index)
     def reset_cursor(self):
         '''
         make the cursor be initialize
         '''
         self.front = 0
-    def re_shuffle(self):
-        '''
-        re shuffle the m_items
-        '''
-        self.reset_cursor()
-        self.shuffle()
     def head(self):
         '''
         function to get the head item\n
