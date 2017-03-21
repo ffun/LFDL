@@ -47,8 +47,9 @@ bh = Fut.BatchHelper((batch,label))
 #乱序
 bh.shuffle()
 #拿到队头元素，注意到BatchHelper.head()方法返回的是tuple类型，其顺序和构造函数的入参一致
-current_data = bh.head()[0]
-current_label = bh.head()[1]
-print current_data,current_label
+current = bh.head()
+d = current[0]
+l = current[1]
+print d,l
 ```
 

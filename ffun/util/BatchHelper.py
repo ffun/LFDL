@@ -57,6 +57,9 @@ class BatchHelper(object):
             for i in range(len(self.m_items)):
                 #get the head of the all the item-queue
                 item.append(self.m_items[i][self.index[self.front]])
-                self.front = self.front + 1
-        return tuple(item)
+            self.front = self.front + 1
+        if item != None:
+            return tuple(item)
+        else:
+            return item
 

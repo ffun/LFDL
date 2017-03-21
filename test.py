@@ -25,7 +25,8 @@ batch = [1,2,3,4,5]
 label = [1,2,3,4,5]
 bh = Fut.BatchHelper((batch,label))
 bh.shuffle()
-current_data = bh.head()[0]
-current_label = bh.head()[1]
-
-print current_data,current_label
+current = bh.head()
+if current != None:
+    d = current[0]
+    l = current[1]
+    print d,l
