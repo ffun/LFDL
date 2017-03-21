@@ -11,11 +11,12 @@ class Checker(object):
     def type_check(cls, obj, types):
         '''
         check type\n
-        @
+        @obj:object\n
+        @types:all types which could be accept
         '''
         Good = False
         for i in range(len(types)):
-            if obj is types[i]:
+            if isinstance(obj,types[i]):
                 Good = True
                 break
         assert Good is True
