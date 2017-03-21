@@ -34,12 +34,13 @@ class BatchHelper(object):
         for i in range(len(self.m_items)):
             Checker.seq_len_check(self.m_items[i], seq_length)
 
-    def shuffle(self):
+    def shuffle(self,times=1):
         '''
         shuffle the m_items
         '''
         self.reset_cursor()
-        random.shuffle(self.index)
+        for i in range(times):
+            random.shuffle(self.index)
     def reset_cursor(self):
         '''
         make the cursor be initialize
