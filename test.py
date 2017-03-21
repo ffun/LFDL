@@ -21,7 +21,11 @@ extractor = Fio.EPIextractor('/Users/fang/workspaces/tf_space/LFDL/pngdata/epi36
 extractor.extract(100)
 '''
 #example4
-a = [1,2,3,4,5]
-sq = Fut.ShuffleQueue(a)
-sq.shuffle()
-print sq.get_item()
+batch = [1,2,3,4,5]
+label = [1,2,3,4,5]
+bh = Fut.BatchHelper((batch,label))
+bh.shuffle()
+current_data = bh.head()[0]
+current_label = bh.head()[1]
+
+print current_data,current_label

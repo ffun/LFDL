@@ -50,7 +50,7 @@ class BatchHelper(object):
         '''
         self.reset_cursor()
         self.shuffle()
-    def get_item(self):
+    def head(self):
         '''
         function to get the head item\n
         返回所有序列的队头元素组成的元组

@@ -38,14 +38,17 @@ label = labelloader.read('/Users/fang/workspaces/tf_space/LFDL/disp.txt',float)
 ```  
 - batch乱序  
 batch-data在输入网络时最好是先经过乱序，这样训练处的模型鲁棒性会更强。
-```python
-#输入一个list或者tuple
-a = [1,2,3,4,5]
-#实例化ShuffleQueue对象
-sq = Fut.ShuffleQueue(a)
-#进行乱序
-sq.shuffle()
-#通过get_item方法拿到队头元素
-print sq.get_item()
+```python  
+#数据batch和label序列，需要保证长度一致，可以是list或者tuple类型
+batch = [1,2,3,4,5]
+label = [1,2,3,4,5]
+#实例化BatchHelper
+bh = Fut.BatchHelper((batch,label))
+#乱序
+bh.shuffle()
+#拿到队头元素，注意到BatchHelper.head()方法返回的是tuple类型，其顺序和构造函数的入参一致
+current_data = bh.head()[0]
+current_label = bh.head()[1]
+print current_data,current_label
 ```
 
