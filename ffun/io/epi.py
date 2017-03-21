@@ -96,15 +96,16 @@ class EPIextractor(object):
         '''
         self.padding = num
         self.pad_mode = mode
-    def extract(self, point_x, length=32):
+    def extract(self, point_x, length=31):
         '''
         function to extract a window of origin EPI file\n
         @point_x:point's x coordinate\n
-        @length:window's Length
+        @length:window's Length,length应该是一个奇数
         '''
-        if self.im_array is None:#若持有的im_array是num，则获取到它的值。(lazy loading)
+        if self.im_array is None:#若持有的im_array是None，则获取到它的值。(lazy loading)
             with open(self.file, 'r') as f:
                 im = Image.open(f)
                 im_array = np.array(im)#转换图像为numpy形式，深拷贝
-        extract_epi = im_array[:,point_x-length/2:point_x+length/2,:]
+        extract_epi = im_array[:, point_x-length/2:point_x+(length)/2, :]
         return extract_epi
+        #print extract_epi.shape

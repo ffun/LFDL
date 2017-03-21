@@ -15,12 +15,12 @@ class TextLoader(object):
         self.data = []
         self.separator = separator
 
-    def read(self, filepath, transform=float):
+    def read(self, filepath, transform=None):
         '''
         Function to get a list of data\n
         @filepath:the path of the file\n
         @transform:transform the single data,default:float\n
-        Example\n
+        Example:\n
         1:line in file "1 2\\r\\n"\n
         result:[1,2]\n
         2:line in file "1 2\\r\\n3 4\\r\\n"\n
@@ -30,12 +30,8 @@ class TextLoader(object):
             for line in f.readlines():
                 line = line.strip()#过滤掉换行符
                 data = line.split(self.separator)
-                data = map(transform, data)
+                #if transform Function is not None,do transform
+                if not transform is None:
+                    data = map(transform, data)
                 self.data.append(data)
         return tuple(self.data)
-
-    def getdata(self):
-        if len(self.data) != 0:
-            return self.data
-        else:
-            return None
