@@ -3,10 +3,14 @@
 
 # ffun
 自己写的一个python package,依赖于PIL,numpy,scipy,tensorflow等  
-## ffun.io Instruction  
-- EPI Genration  
+## ffun Instruction  
+- 导入package  
 ```python
 import ffun.io as Fio
+import ffun.util as Fut
+```
+- EPI Genration  
+```python
 #得到文件列表，入参为文件目录。
 #返回的文件列表是经过排序的(排序规则为字典序)
 files =  Fio.FileHelper.get_files('/Users/fang/workspaces/tf_space/LFDL/pngdata')

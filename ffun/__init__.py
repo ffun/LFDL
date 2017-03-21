@@ -1,3 +1,3 @@
 
 from io import *
-import ShuffleQueue
+from util import *
