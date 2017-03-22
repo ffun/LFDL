@@ -19,7 +19,7 @@ labelloader.read('/Users/fang/workspaces/tf_space/LFDL/disp.txt', float)
 
 #example3:extract epi file,return a numpy ndarray
 extractor = Fio.EPIextractor('/Users/fang/workspaces/tf_space/Box/epi45_53/epi_45_53_002.png')
-extractor.set_padding(0,'1')
+extractor.save_extract(256,'/Users/fang/workspaces/tf_space/test')
 
 '''
 #example4
@@ -34,3 +34,4 @@ if current != None:
     l = current[1]
     print d,l
 '''
+

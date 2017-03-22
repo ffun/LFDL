@@ -132,5 +132,20 @@ class EPIextractor(object):
         '''
         if self.im_array is None:#若持有的im_array是None，则获取到它的值。(lazy loading)
             self.__loadfile()
-        extract_epi = self.im_array[:, point_x-length/2:point_x+(length)/2, :]
+        #获得epi切片。因为ndarray切片时是到后项index前一个的，所以后项index要+1
+        extract_epi = self.im_array[:, point_x-length/2:point_x+(length)/2+1, :]
         return extract_epi
+
+    def save_extract(self, point_x, folder, length=31):
+        '''
+        extract the epi patch and save it
+        '''
+        epi = self.extract(point_x,length)
+        epi_pre_fn = os.path.split(self.file)[1]#get the origin filename
+        suffix = ".png"
+        #generate the new name
+        #文件名规则:原文件名+point_x+原文件的后缀名,表示该epi是在某文件的某点处提取的
+        epi_fn = folder+'/'+epi_pre_fn[:epi_pre_fn.find(suffix)]+'_{:0>3}'.format(point_x)+suffix
+        #new image & change the data into uint8
+        epi_img = Image.fromarray(np.uint8(epi))
+        epi_img.save(epi_fn)
