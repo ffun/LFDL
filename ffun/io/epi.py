@@ -85,27 +85,67 @@ class EPIextractor(object):
     '''
     def __init__(self, epi_file):
         self.file = epi_file
-        self.padding = 0
         self.pad_mode = None
+        self.pad_num = 0
         self.im_array = None
-    def set_padding(self, num, mode):
+    def set_padding(self, pad_num, mode='c=0'):
         '''
         function to set padding\n
-        @num:number of pixels to be padded\n
-        @mode:how to pad the image\n
+        @pad_num:图像单侧需要pad的数量,对epi而言,只是在图片两侧补pad,即增加图片的width。
+        单侧增加的width为提取时的length的1/2\n
+        @mode:\n
+        1)constant mode\n
+        'c=0'-->constant and value is 0,'c=1'-->constant and value is 1
+        2)mirror mode\n
+        
         '''
-        self.padding = num
+        self.pad_num = pad_num
         self.pad_mode = mode
+        #load the origin epi file
+        if self.im_array is None:
+            self.__loadfile()
+        shape = self.im_array.shape
+        width = shape[1]#获得宽度
+        v = 0
+        if cmp('c', mode[0]):#constant mode
+            v = int(mode[2])
+        if cmp('m', mode[0]):#mirror mode,not realize
+            pass
+        nd = np.zeros([shape[0], shape[1]+pad_num*2, shape[2]])
+        nd[:, pad_num:shape[1]+pad_num:, :] = self.im_array# copy the data into padded area
+        self.im_array = nd# replace the im_marry
+
+    def __loadfile(self):
+        '''
+        function to load origin epi file and store it with numpy ndarray
+        '''
+        with open(self.file, 'r') as f:
+            im = Image.open(f)
+            self.im_array = np.array(im)#转换图像为numpy形式，深拷贝
     def extract(self, point_x, length=31):
         '''
         function to extract a window of origin EPI file\n
         @point_x:point's x coordinate\n
+        if extract not in padding mode,point_x is in[length/2,width - length/2]\n
+        else it's in [0,width-1]\n
         @length:window's Length,length应该是一个奇数
         '''
         if self.im_array is None:#若持有的im_array是None，则获取到它的值。(lazy loading)
-            with open(self.file, 'r') as f:
-                im = Image.open(f)
-                im_array = np.array(im)#转换图像为numpy形式，深拷贝
-        extract_epi = im_array[:, point_x-length/2:point_x+(length)/2, :]
+            self.__loadfile()
+        #获得epi切片。因为ndarray切片时是到后项index前一个的，所以后项index要+1
+        extract_epi = self.im_array[:, point_x-length/2:point_x+(length)/2+1, :]
         return extract_epi
-        #print extract_epi.shape
+
+    def save_extract(self, point_x, folder, length=31):
+        '''
+        extract the epi patch and save it
+        '''
+        epi = self.extract(point_x,length)
+        epi_pre_fn = os.path.split(self.file)[1]#get the origin filename
+        suffix = ".png"
+        #generate the new name
+        #文件名规则:原文件名+point_x+原文件的后缀名,表示该epi是在某文件的某点处提取的
+        epi_fn = folder+'/'+epi_pre_fn[:epi_pre_fn.find(suffix)]+'_{:0>3}'.format(point_x)+suffix
+        #new image & change the data into uint8
+        epi_img = Image.fromarray(np.uint8(epi))
+        epi_img.save(epi_fn)
