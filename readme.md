@@ -48,8 +48,10 @@ bh = Fut.BatchHelper((batch,label))
 bh.shuffle()
 #拿到队头元素，注意到BatchHelper.head()方法返回的是tuple类型，其顺序和构造函数的入参一致
 current = bh.head()
-d = current[0]
-l = current[1]
-print d,l
+#judge if current is None
+if current != None:
+    d = current[0]
+    l = current[1]
+    print d,l
 ```
 
