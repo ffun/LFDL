@@ -19,10 +19,10 @@ class BatchHelper(object):
         构造函数入参为多个数据序列，这些序列的长度要一致
         '''
         self.m_items = m_items
+        self.__check()#校验，确保正确
         self.index = [i for i in range(len(self.m_items[0]))]
         self.front = 0
-        self.end = len(m_items)
-        self.__check()#校验，确保正确
+        self.end = len(m_items[0])#self.end point to the end of seq
     def __check(self):
         '''
         数据校验
@@ -72,8 +72,14 @@ class BatchHelper(object):
         if batch_size < items_num:
             bz = batch_size
         batch = []
+        index = self.index[self.front:bz+self.front]# index section
         #generate batch
         for i in range(len(self.m_items)):
-            batch.append(self.m_items[i][self.front:bz+self.front])
+            batch_part = []
+            items = self.m_items[i]# get the itmes
+            for j in range(len(index)):
+                elem = items[index[j]]# get the elem
+                batch_part.append(elem)
+            batch.append(batch_part)
         self.front = self.front + bz#update front cursor
         return tuple(batch)
