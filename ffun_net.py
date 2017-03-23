@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import tensorflow as tf
 from ffun.util import *
 
@@ -8,17 +10,17 @@ height = 9
 x = tf.placeholder('float', shape=[None, height*width*channels])
 y_ = tf.placeholder('float',shape=[None, 1])
 
-x_image = tf.reshape(x, shape=[-1, width, height, channels])
+x_image = tf.reshape(x, shape=[-1, height, width, channels])
 #conv1 para
-w_conv1 = Layer.weight_variable([3,3,3,32], Name="w_conv1")
+w_conv1 = Layer.weight_variable([3, 3, 3, 64], Name="w_conv1")
 b_conv1 = Layer.bias_variable([32], Name="b_conv1")
 
 #hidden1
 h_conv1 = tf.nn.relu(Layer.conv(x_image, w_conv1, [1, 1, 1, 1]) + b_conv1)
-h_pool1 = Layer.pool(h_conv1, Ksize=[1, 1, 2, 3], Strides=[1, 1, 2, 1])
+h_pool1 = Layer.pool(h_conv1, Ksize=[1, 1, 2, 1], Strides=[1, 1, 2, 1])
 
 #conv2 para
-w_conv2 = Layer.weight_variable([3,3,3,64], Name="w_conv2")
+w_conv2 = Layer.weight_variable([3, 3, 64, 128], Name="w_conv2")
 b_conv2 = Layer.bias_variable([64], Name="b_conv2")
 
 #hidden2

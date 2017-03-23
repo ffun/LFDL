@@ -1,6 +1,6 @@
 '''
-file:Checker.py\n
-@author:fang.junpeng\n
+file:Checker.py
+@author:fang.junpeng
 @email:tfzsll@126.com
 '''
 class Checker(object):
