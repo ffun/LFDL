@@ -62,4 +62,18 @@ class BatchHelper(object):
             return tuple(item)
         else:
             return item
-
+    def get_batch(self, batch_size):
+        '''
+        function to get a batch items of batch-size
+        '''
+        items_num = self.end - self.front#剩余元素的总数
+        bz = items_num
+        #set bz
+        if batch_size < items_num:
+            bz = batch_size
+        batch = []
+        #generate batch
+        for i in range(len(self.m_items)):
+            batch.append(self.m_items[i][self.front:bz+self.front])
+        self.front = self.front + bz#update front cursor
+        return tuple(batch)
