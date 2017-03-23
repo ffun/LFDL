@@ -140,7 +140,7 @@ class EPIextractor(object):
         '''
         extract the epi patch and save it
         '''
-        epi = self.extract(point_x,length)
+        epi = self.extract(point_x, length)
         epi_pre_fn = os.path.split(self.file)[1]#get the origin filename
         suffix = ".png"
         #generate the new name
