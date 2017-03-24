@@ -12,9 +12,9 @@ files =  Fio.FileHelper.get_files('/Users/fang/workspaces/tf_space/LFDL/pngdata'
 #创建EPI生成器对象，入参为文件列表的元组
 Epi_creator = Fio.EPIcreator(files)
 #生成EPI文件，入参为图片索引闭区间
-Epi_creator.create((36,44))
+Epi_creator.create((45,53))
 ```  
-上述代码会在`pngdata`目录下产生`epi36_44`目录，并在目录下产生epi36_44_000~511.png（假设原始图像height = 512）。生成的epi数据是原始epi，实际训练可能只是其中的一个窗口数据，此时需要调用`EPIextractor`提供的方法。  
+上述代码会在`pngdata`目录下产生`epi45_53`目录，并在目录下产生epi45_53_000~511.png（假设原始图像height = 512）。生成的epi数据是原始epi，实际训练可能只是其中的一个窗口数据，此时需要调用`EPIextractor`提供的方法。  
 
 ## EPI extract  
 ```python
