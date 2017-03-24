@@ -78,7 +78,7 @@ Step 19200: loss = 0.59 (4543.488 sec)
     3. `ffun_train.py`文件内只有一个`run_train()`函数，该函数的作用类似于[***Caffe Framework***][caffe-link]中`Sovler`，主要在其中控制迭代次数、保存模型、测试等。还有就是给网络喂`feed_dict`(tensorflow特有的两种传递参数的方式之一)。
     4. 其他的扩展和修改请深入学习tensorflow  
 
-6. 本代码结构参照tensorflow的mnist例子而写，但是网络模型、训练细节等方面有一些不同。tensorflow mnist代码链接：[**mnist.py**][caffe-link]、[**fully_connected_feed.py**][fully_connected_feed-code]
+6. 本代码结构参照tensorflow的mnist例子而写，但是网络模型、训练细节等方面有一些不同。tensorflow mnist代码链接：[**mnist.py**][mnist-code]、[**fully_connected_feed.py**][fully_connected_feed-code]
 
 
 [caffe-link]:http://caffe.berkeleyvision.org/
