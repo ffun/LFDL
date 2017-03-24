@@ -95,7 +95,7 @@ class BatchHelper(object):
                 data_part.append(elem)
             data.append(data_part)
         return data
-    def get_batch(self, batch_size):
+    def next_batch(self, batch_size):
         '''
         function to get a batch items of batch-size\n
         it will get batch circularly\n
@@ -104,7 +104,7 @@ class BatchHelper(object):
         items_num = self.end - self.front#剩余元素的总数
         bz_end = items_num
         index = None
-        #set bz circularly && generate index
+        #set bz_end circularly && generate index
         if batch_size > items_num and items_num != 0:#当剩余的元素数量比要获取的batch_size小的时候
             bz_end = items_num - batch_size
             index = self.index[bz_end:self.end]#index part1
