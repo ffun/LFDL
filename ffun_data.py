@@ -22,7 +22,9 @@ img_cfg = {
 }
 #epi 配置文件
 epi_cfg = {
-    'length':33,#需要提取的epi长度
+    'height':9,
+    'width':33,#需要提取的epi长度
+    'channel':3,
     'mode':'c=0'
 }
 
@@ -44,12 +46,13 @@ def batch_data(tdc=train_data_cfg):
     for i in range(len(origin_epi_list)):
         Extractor = Fio.EPIextractor(origin_epi_list[i])
         #给原图像加上padding,这样下面我们就可以提取长度为33的
-        Extractor.set_padding(epi_cfg['length']/2, epi_cfg['mode'])
+        Extractor.set_padding(epi_cfg['width']/2, epi_cfg['mode'])
         for j in range(img_cfg['width']):
-            epi = Extractor.extract(j, epi_cfg['length'])
+            epi = Extractor.extract(j, epi_cfg['width'])
             epi_list.append(epi)
     #load labels
-    labels = Fio.TextLoader.read(train_data_cfg['label-dir'], float)
+    LabelLoader = Fio.TextLoader()
+    labels = LabelLoader.read(train_data_cfg['label-dir'], float)
     labels = np.array(labels)#转为numpy.ndarray类型数据
     assert len(labels) == len(epi_list)#check
     data_batch = Fut.BatchHelper((epi_list, labels))
@@ -67,11 +70,11 @@ def placeholder_inputs(batch_size):
         images_placeholder: Images placeholder.
         labels_placeholder: Labels placeholder.
     '''
-    H, W, C = img_cfg['height'], img_cfg['width'], img_cfg['channel']
-    images_placeholder = tf.placeholder(tf.float32, shape=(batch_size, H, W, C))
-    labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size))
+    H, W, C = epi_cfg['height'], epi_cfg['width'], epi_cfg['channel']
+    epi_img_placeholder = tf.placeholder(tf.float32, shape=(batch_size, H, W, C))
+    labels_placeholder = tf.placeholder(tf.float32, shape=(batch_size))
     keep_prob_placeholder = tf.placeholder('float')
-    return images_placeholder, labels_placeholder, keep_prob_placeholder
+    return epi_img_placeholder, labels_placeholder, keep_prob_placeholder
 
 def fill_feed_dict(data_set, images_pl, labels_pl, prob_pl, mode='train'):
     '''
