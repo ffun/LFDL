@@ -5,7 +5,6 @@
 自己写的一个python package,依赖于PIL,numpy,scipy,tensorflow等。  
 请参照ffun.doc目录下的说明文档
 
----  
 ## ffun-net使用说明  
 1. 下载本代码  
 ```bash
@@ -76,7 +75,7 @@ Step 19200: loss = 0.59 (4543.488 sec)
 5. 修改与扩展  
     1. 注意：当你修改`ffun_data.py`中的配置文件，包括`img_cfg`、`epi_cfg`时，这会改变输入数据的尺寸。此时，你可能需要重新设计卷积尺寸，以及计算出卷积后全连接时的神经元个数，并打开`ffun_net.py`文件修改相关的参数。  
     2. 如果要自定义网络结构，则修改`ffun_net.py`中`infer()`、`loss`的实现即可(函数名不需要修改)，还可以修改`train()`中的`optimizer`不同的参数更新的方法(在本代码中使用的是简单梯度下降方式)  
-    3. `ffun_train.py`文件内只有一个`run_train()`函数，该函数的作用类似于[***Caffe Framework***][caffe-link]中`Sovler`，主要在其中控制迭代次数、保存模型、测试等。还有就是给模型为`feed_dict`(tensorflow特有的两种传递参数的方式之一)。
+    3. `ffun_train.py`文件内只有一个`run_train()`函数，该函数的作用类似于[***Caffe Framework***][caffe-link]中`Sovler`，主要在其中控制迭代次数、保存模型、测试等。还有就是给网络喂`feed_dict`(tensorflow特有的两种传递参数的方式之一)。
     4. 其他的扩展和修改请深入学习tensorflow  
 
 6. 本代码结构参照tensorflow的mnist例子而写，但是网络模型、训练细节等方面有一些不同。tensorflow mnist代码链接：[**mnist.py**][caffe-link]、[**fully_connected_feed.py**][fully_connected_feed-code]
