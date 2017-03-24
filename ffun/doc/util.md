@@ -26,4 +26,5 @@ if current != None:
 current = bh.next_batch(5)
 datas = current[0]#len(data)=5
 labels = current[1]#len(label)=5
-```
+```  
+<font color=#FF7F50>提醒：</font>以上是对加载到内存中的2个序列创建BatchHelper对象，然后进行乱序。然而，当数据足够大时并不能全部加载到内存后再进行乱序。此时，可以生成数据路径的乱序索引文件，然后在训练时对该文件进行加载。
