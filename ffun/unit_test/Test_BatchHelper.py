@@ -19,4 +19,4 @@ print 'Test:BatchHelper OK'
 '''
 bh.print_data()
 for i in range(5):
-    print bh.get_batch(5)
+    print bh.next_batch(5)

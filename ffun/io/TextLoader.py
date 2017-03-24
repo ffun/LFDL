@@ -12,7 +12,6 @@ class TextLoader(object):
         @separator:the separator of element in one line,\n
         Default is space
         '''
-        self.data = []
         self.separator = separator
 
     def read(self, filepath, transform=None):
@@ -27,11 +26,11 @@ class TextLoader(object):
         result:[[1,2],[3,4]]
         '''
         with open(filepath, "rb") as f:
+            d = []
             for line in f.readlines():
                 line = line.strip()#过滤掉换行符
                 data = line.split(self.separator)
                 #if transform Function is not None,do transform
-                if not transform is None:
-                    data = map(transform, data)
-                self.data.append(data)
-        return tuple(self.data)
+                for i in range(len(data)):
+                    d.append(transform(data[i]))
+        return tuple(d)
