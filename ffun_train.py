@@ -16,7 +16,8 @@ def placeholder_inputs(batch_size, shape):
 
 def fill_feed_dict(data_set, images_pl, labels_pl):
     #batch size 
-    images_feed, labels_feed# = 
+    current = 
+    images_feed, labels_feed = 
     feed_dict = {
         images_pl: images_feed,
         labels_pl: labels_feed,
