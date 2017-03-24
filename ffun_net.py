@@ -3,11 +3,7 @@
 import tensorflow as tf
 from ffun.util import *
 import ffun_data
-'''
-channels = 3
-width = 33
-height = 9
-'''
+
 channels = ffun_data.img_cfg['channel']
 width = ffun_data.img_cfg['width']
 height = ffun_data.img_cfg['height']
