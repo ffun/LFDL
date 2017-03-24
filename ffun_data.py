@@ -6,6 +6,7 @@
 import tensorflow as tf
 import ffun.util as Fut
 import ffun.io as Fio
+import numpy as np
 
 #配置文件
 train_data_cfg = {
@@ -49,6 +50,7 @@ def batch_data(tdc=train_data_cfg):
             epi_list.append(epi)
     #load labels
     labels = Fio.TextLoader.read(train_data_cfg['label-dir'], float)
+    labels = np.array(labels)#转为numpy.ndarray类型数据
     assert len(labels) == len(epi_list)#check
     data_batch = Fut.BatchHelper((epi_list, labels))
     print 'generate batch done!'
@@ -68,22 +70,26 @@ def placeholder_inputs(batch_size):
     H, W, C = img_cfg['height'], img_cfg['width'], img_cfg['channel']
     images_placeholder = tf.placeholder(tf.float32, shape=(batch_size, H, W, C))
     labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size))
-    return images_placeholder, labels_placeholder
+    keep_prob_placeholder = tf.placeholder('float')
+    return images_placeholder, labels_placeholder, keep_prob_placeholder
 
-def fill_feed_dict(data_set, images_pl, labels_pl):
+def fill_feed_dict(data_set, images_pl, labels_pl, prob_pl, mode='train'):
     '''
     function to generate feed_dict\n
     @data_set:The set of images and labels,from batch_data()
     @images_pl: The images placeholder,from placeholder_inputs().
     @labels_pl: The labels placeholder,from placeholder_inputs().
+    @prob_pl: The keep_prop placeholder,from placeholder_inputs().
     '''
-    data = None
-    if isinstance(data, Fut.BatchHelper):
-        data = data_set.next_batch(50)
-    images_feed, labels_feed = data[0],data[1]
+    data = data_set
+    images_feed, labels_feed = data[0], data[1]
+    prop = 0.5
+    if cmp(mode, 'test'):#if test phase
+        prop = 1.0
     feed_dict = {
       images_pl: images_feed,
       labels_pl: labels_feed,
+      prob_pl: prop
     }
     return feed_dict
 

@@ -12,10 +12,11 @@ channels = ffun_data.img_cfg['channel']
 width = ffun_data.img_cfg['width']
 height = ffun_data.img_cfg['height']
 
-def infer(images):
+def infer(images, keep_prob):
     '''
     function:infer function is to build net,give the forward compute\n
-    @images:Images placeholder from ffun_data
+    @images:Images placeholder from ffun_data\n
+    @keep_prob:dropout layer's keep_prop
     '''
     #conv1 para
     w_conv1 = Layer.weight_variable([3, 3, 3, 64], Name="w_conv1")
@@ -23,7 +24,7 @@ def infer(images):
 
     #hidden1
     h_conv1 = tf.nn.relu(Layer.conv(images, w_conv1, [1, 1, 1, 1]) + b_conv1)
-    h_pool1 = Layer.pool(h_conv1, Ksize=[1, 1, 2, 1], Strides=[1, 1, 2, 1])
+    h_pool1 = Layer.pool(h_conv1, ksize=[1, 1, 2, 1], strides=[1, 1, 2, 1])
 
     #conv2 para
     w_conv2 = Layer.weight_variable([3, 3, 64, 128], Name="w_conv2")
@@ -31,7 +32,7 @@ def infer(images):
 
     #hidden2
     h_conv2 = tf.nn.relu(Layer.conv(h_pool1, w_conv2, [1, 1, 1, 1]) + b_conv2)
-    h_pool2 = Layer.pool(h_conv2, Ksize=[1, 1, 2, 1], Strides=[1, 1, 2, 1])
+    h_pool2 = Layer.pool(h_conv2, ksize=[1, 1, 2, 1], strides=[1, 1, 2, 1])
 
     #w_fc1
     w_fc1 = Layer.weight_variable([5*6*128, 1024])
@@ -41,7 +42,6 @@ def infer(images):
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, w_fc1) + b_fc1)
 
     #dropout
-    keep_prob = tf.placeholder('float')
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
     #w_fc2
@@ -52,12 +52,12 @@ def infer(images):
 
     return inference
 
-def loss(inference, label):
+def loss(inference, labels):
     '''
     function:loss function use the inference and label to compute loss
     '''
     #回归的损失函数
-    return tf.reduce_mean(tf.square(inference - label))
+    return tf.reduce_mean(tf.square(inference - labels))
 
 def train(loss, lr):
     '''
