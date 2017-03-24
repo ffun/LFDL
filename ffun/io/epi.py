@@ -109,7 +109,7 @@ class EPIextractor(object):
         v = 0
         if cmp('c', mode[0]):#constant mode
             v = int(mode[2])
-        if cmp('m', mode[0]):#mirror mode,not realize
+        elif cmp('m', mode[0]):#mirror mode,not realize
             pass
         nd = np.zeros([shape[0], shape[1]+pad_num*2, shape[2]])
         nd[:, pad_num:shape[1]+pad_num:, :] = self.im_array# copy the data into padded area
@@ -122,7 +122,7 @@ class EPIextractor(object):
         with open(self.file, 'r') as f:
             im = Image.open(f)
             self.im_array = np.array(im)#转换图像为numpy形式，深拷贝
-    def extract(self, point_x, length=31):
+    def extract(self, point_x, length=33):
         '''
         function to extract a window of origin EPI file\n
         @point_x:point's x coordinate\n
@@ -132,11 +132,20 @@ class EPIextractor(object):
         '''
         if self.im_array is None:#若持有的im_array是None，则获取到它的值。(lazy loading)
             self.__loadfile()
+        #get x's coordinate,坐标转换
+        x = point_x
+        shape = self.im_array.shape
+        #如果该epi设置了padding,那么提取的坐标点将发生偏移,需进行坐标转换
+        if self.pad_mode != None:#judge if the padding is actived
+            assert x >= 0 and x <= shape[1]#x belong [0,img_width]
+            x = x + length/2
+        else:
+            assert x >= length/2 and x <= shape[1]-length/2 - 1
         #获得epi切片。因为ndarray切片时是到后项index前一个的，所以后项index要+1
-        extract_epi = self.im_array[:, point_x-length/2:point_x+(length)/2+1, :]
+        extract_epi = self.im_array[:, x-length/2:x+(length)/2+1, :]
         return extract_epi
 
-    def save_extract(self, point_x, folder, length=31):
+    def save_extract(self, point_x, folder, length=33):
         '''
         extract the epi patch and save it
         '''
