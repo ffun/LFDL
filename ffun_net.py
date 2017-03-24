@@ -3,11 +3,7 @@
 import tensorflow as tf
 from ffun.util import *
 import ffun_data
-'''
-channels = 3
-width = 33
-height = 9
-'''
+
 channels = ffun_data.img_cfg['channel']
 width = ffun_data.img_cfg['width']
 height = ffun_data.img_cfg['height']
@@ -19,16 +15,16 @@ def infer(images, keep_prob):
     @keep_prob:dropout layer's keep_prop
     '''
     #conv1 para
-    w_conv1 = Layer.weight_variable([3, 3, 3, 64], Name="w_conv1")
-    b_conv1 = Layer.bias_variable([32], Name="b_conv1")
+    w_conv1 = Layer.weight_variable([3, 3, 3, 64], name="w_conv1")
+    b_conv1 = Layer.bias_variable([64], name="b_conv1")
 
     #hidden1
     h_conv1 = tf.nn.relu(Layer.conv(images, w_conv1, [1, 1, 1, 1]) + b_conv1)
     h_pool1 = Layer.pool(h_conv1, ksize=[1, 1, 2, 1], strides=[1, 1, 2, 1])
 
     #conv2 para
-    w_conv2 = Layer.weight_variable([3, 3, 64, 128], Name="w_conv2")
-    b_conv2 = Layer.bias_variable([64], Name="b_conv2")
+    w_conv2 = Layer.weight_variable([3, 3, 64, 128], name="w_conv2")
+    b_conv2 = Layer.bias_variable([128], name="b_conv2")
 
     #hidden2
     h_conv2 = tf.nn.relu(Layer.conv(h_pool1, w_conv2, [1, 1, 1, 1]) + b_conv2)
@@ -57,7 +53,7 @@ def loss(inference, labels):
     function:loss function use the inference and label to compute loss
     '''
     #回归的损失函数
-    return tf.reduce_mean(tf.square(inference - labels))
+    return tf.reduce_mean(tf.square(inference - labels), name='L2_Loss_mean')
 
 def train(loss, lr):
     '''
