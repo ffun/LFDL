@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-
+'''
+author:fang.junpeng\n
+email:tfzsll@126.com\n
+'''
 import tensorflow as tf
 from Checker import Checker
 
