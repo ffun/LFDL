@@ -77,6 +77,8 @@ class NetCalculator(object):
             new_shape[2] = out_channel#assign out_channel to in_channel of shape
         elif layer_type == 'pool':
             new_shape[2] = old_shape[2]
+            Kw = StrideKw
+            Kh = StrideKh
         #compute output shape,(H,W,C)
         H0 = (Hi + 2*padding - Kh)/StrideKh + 1
         W0 = (Wi + 2*padding - Kw)/StrideKw + 1
