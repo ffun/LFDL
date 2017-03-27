@@ -41,12 +41,12 @@ import ffun.util as Fut
 nc = Fut.NetCalculator()
 #第一步是设置数据层，否则会报错
 nc.set_dataLayer([9,33,3])
-#添加层，参数1是类型
-nc.append_layer('conv',ksize=[3,3,3,64])
-nc.append_layer('pool',ksize=[1,1,2,1],strides=[1,1,2,1])
-nc.append_layer('conv',ksize=[3, 3, 64, 128])
-nc.append_layer('pool',ksize=[1,1,2,1],strides=[1,1,2,1])
-#输出层信息
+#添加层信息
+nc.add_conv_layer(ksize=[3, 3, 3, 64])
+nc.add_pool_layer(ksize=[1,1,2,1],strides=[1,1,2,1])
+nc.add_conv_layer(ksize=[3, 3, 64, 128])
+nc.add_pool_layer(ksize=[1,1,2,1],strides=[1,1,2,1])
+#print messge
 nc.print_layers()
 print nc.num_of_layers()
 ```
@@ -54,16 +54,13 @@ print nc.num_of_layers()
 输出的信息类似如下（output行在输出时会显示为绿色）：
 
 ```bash
-data-layer->ksize:0;strides:0
-
-output:[ 9 33  3]
-conv2->ksize:[3, 3, 3, 64];strides:[1, 1, 1, 1]
-output:[ 7 31 64]
-pool3->ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
-output:[ 7 15 64]
-conv4->ksize:[3, 3, 64, 128];strides:[1, 1, 1, 1]
-output:[  5  13 128]
-pool5->ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
-output:[  5   6 128]
-5
+input:[9, 33, 3]
+conv1--ksize:[3, 3, 3, 64];strides:[1, 1, 1, 1]
+output:[7, 31, 64]
+pool1--ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
+output:[7, 15, 64]
+conv2--ksize:[3, 3, 64, 128];strides:[1, 1, 1, 1]
+output:[5, 13, 128]
+pool2--ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
+output:[5, 6, 128]
 ```
