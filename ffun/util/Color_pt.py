@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-
+'''
+author:fang.junpeng\n
+email:tfzsll@126.com\n
+'''
 def pt(obj, color='green'):
     color_set = {'red':'0;31m','green':'0;32m','blue':'0;33m'}
     color_cmd = None

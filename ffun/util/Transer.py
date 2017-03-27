@@ -18,7 +18,7 @@ def im_con_Channel(nds):
     channels = shape[-1]
     new_shape = []
     #generate new shape
-    for i in range(len(shape)):
+    for i in xrange(len(shape)):
         if i == len(shape) - 1:
             new_shape.append(shape[i]*len(nds))
         else:
@@ -26,6 +26,6 @@ def im_con_Channel(nds):
     #generate ndarray object
     comb = np.ndarray(new_shape)
     #generate the combined ndarray
-    for i in range(len(nds)):
+    for i in xrange(len(nds)):
         comb[:, :, channels*i:channels*(i+1)] = nds[i][:, :, :]
     return comb
