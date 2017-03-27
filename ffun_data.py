@@ -43,11 +43,11 @@ def batch_data(tdc=train_data_cfg):
     #得到排序后的图片文件列表
     origin_epi_list = Fio.FileHelper.get_files(tdc['origin-epi-dir'])
     epi_list = []
-    for i in range(len(origin_epi_list)):
+    for i in xrange(len(origin_epi_list)):
         Extractor = Fio.EPIextractor(origin_epi_list[i])
         #给原图像加上padding,这样下面我们就可以提取长度为33的
         Extractor.set_padding(epi_cfg['width']/2, epi_cfg['mode'])
-        for j in range(img_cfg['width']):
+        for j in xrange(img_cfg['width']):
             epi = Extractor.extract(j, epi_cfg['width'])
             epi_list.append(epi)
     #load labels

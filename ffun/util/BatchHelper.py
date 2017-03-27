@@ -32,7 +32,7 @@ class BatchHelper(object):
         Checker.type_check(self.m_items, (list, tuple))
         #长度校验
         seq_length = len(self.m_items[0])
-        for i in range(len(self.m_items)):
+        for i in xrange(len(self.m_items)):
             Checker.seq_len_check(self.m_items[i], seq_length)
 
     def shuffle(self,times=1):
@@ -40,7 +40,7 @@ class BatchHelper(object):
         shuffle the m_items
         '''
         self.reset_cursor()
-        for i in range(times):
+        for i in xrange(times):
             random.shuffle(self.index)
     def reset_cursor(self):
         '''
@@ -56,7 +56,7 @@ class BatchHelper(object):
         item = None
         if self.end - self.front != 1:
             item = []
-            for i in range(len(self.m_items)):
+            for i in xrange(len(self.m_items)):
                 #get the head of the all the item-queue
                 item.append(self.m_items[i][self.index[self.front]])
             self.front = self.front + 1
@@ -72,9 +72,9 @@ class BatchHelper(object):
         '''
         index = self.index
         #generate batch
-        for i in range(len(self.m_items)):
+        for i in xrange(len(self.m_items)):
             item = self.m_items[i]
-            for j in range(len(index)):
+            for j in xrange(len(index)):
                 elem = item[index[j]]
                 sys.stdout.write(str(elem))
             sys.stdout.write(',')
@@ -87,10 +87,10 @@ class BatchHelper(object):
         data = []
         index = self.index
         #generate batch
-        for i in range(len(self.m_items)):
+        for i in xrange(len(self.m_items)):
             data_part = []
             item = self.m_items[i]
-            for j in range(len(index)):
+            for j in xrange(len(index)):
                 elem = item[index[j]]
                 data_part.append(elem)
             data.append(data_part)
@@ -119,10 +119,10 @@ class BatchHelper(object):
             self.front = bz_end#update front cursor
         batch = []
         #generate batch
-        for i in range(len(self.m_items)):
+        for i in xrange(len(self.m_items)):
             batch_part = []
             items = self.m_items[i]# get the itmes
-            for j in range(len(index)):
+            for j in xrange(len(index)):
                 elem = items[index[j]]# get the elem
                 batch_part.append(elem)
             batch.append(batch_part)
