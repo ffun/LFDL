@@ -55,14 +55,15 @@ print nc.num_of_layers()
 
 ```bash
 data-layer->ksize:0;strides:0
+
 output:[ 9 33  3]
 conv2->ksize:[3, 3, 3, 64];strides:[1, 1, 1, 1]
 output:[ 7 31 64]
 pool3->ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
-output:[ 7 16 64]
+output:[ 7 15 64]
 conv4->ksize:[3, 3, 64, 128];strides:[1, 1, 1, 1]
-output:[  5  14 128]
+output:[  5  13 128]
 pool5->ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
-output:[  5   7 128]
+output:[  5   6 128]
 5
 ```
