@@ -15,8 +15,8 @@ class Checker(object):
         @types:all types which could be accept
         '''
         Good = False
-        for i in range(len(types)):
-            if isinstance(obj,types[i]):
+        for i in xrange(len(types)):
+            if isinstance(obj, types[i]):
                 Good = True
                 break
         assert Good is True

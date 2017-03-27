@@ -31,6 +31,6 @@ class TextLoader(object):
                 line = line.strip()#过滤掉换行符
                 data = line.split(self.separator)
                 #if transform Function is not None,do transform
-                for i in range(len(data)):
+                for i in xrange(len(data)):
                     d.append(transform(data[i]))
         return tuple(d)

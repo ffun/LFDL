@@ -65,12 +65,12 @@ class EPIcreator(object):
             im = Image.open(f)
             width, height = im.size
         #generate origin epi
-        for h in range(0, height):
+        for h in xrange(0, height):
             epi_image = Image.new('RGB', (width, end-start+1), (255, 255, 255))
             for j in range(start, end+1):
                 with open(images[j], 'r') as f:
                     im = Image.open(f)
-                    for w in range(0, width):
+                    for w in xrange(0, width):
                         pixel = im.getpixel((w, h))#get the pixel
                         epi_image.putpixel((w, j-start), pixel)#put the pixel into epi_image
             #保存epi图像，图像名称后缀,为截取的区间和高度，其中高度使用3位数对齐
