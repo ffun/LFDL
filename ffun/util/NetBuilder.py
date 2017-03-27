@@ -10,10 +10,10 @@ class Layer(object):
         initial = tf.constant(0.1, shape=shape)
         return tf.Variable(initial, name=name)
     @classmethod
-    def conv(cls, x, W, strides=[1, 1, 1, 1], padding='SAME', name=None):
+    def conv(cls, x, W, strides=[1, 1, 1, 1], padding='VALID', name=None):
         return tf.nn.conv2d(x, W, strides=strides, padding=padding, name=name)
     @classmethod
-    def pool(cls, x, ksize, strides, padding='SAME', style="max", name=None):
+    def pool(cls, x, ksize, strides, padding='VALID', style="max", name=None):
         if cmp(style,"max") == 0:
             return tf.nn.max_pool(x, ksize=ksize, strides=strides, padding=padding, name=name)
 
