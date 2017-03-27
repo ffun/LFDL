@@ -21,7 +21,7 @@ class BatchHelper(object):
         '''
         self.m_items = m_items
         self.__check()#校验，确保正确
-        self.index = [i for i in range(len(self.m_items[0]))]
+        self.index = range(len(self.m_items[0]))#generate a list
         self.front = 0
         self.end = len(m_items[0])#self.end point to the end of seq
     def __check(self):

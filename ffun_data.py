@@ -9,9 +9,9 @@ import ffun.io as Fio
 import numpy as np
 
 #配置文件
-train_data_cfg = {
+train_file_cfg = {
     'img-dir':'/Users/fang/workspaces/tf_space/box',
-    'origin-epi-dir':'/Users/fang/workspaces/tf_space/box/epi45_53',
+    'origin-epi-dir':'/Users/fang/workspaces/tf_space/box/epi36_44',
     'label-dir':'/Users/fang/workspaces/tf_space/LFDL/disp.txt'
 }
 #img 配置文件
@@ -27,18 +27,26 @@ epi_cfg = {
     'channel':3,
     'mode':'c=0'
 }
+#配置文件:训练、验证、测试集的数量
+data_cfg = {
+    'all':512*512,
+    'train':200000,
+    'verify':40000,
+    'test':22000
+}
 
 #generate origin epi data
 def epi_data_generate():
-    files =  Fio.FileHelper.get_files(train_data_cfg['img-dir'])
+    files =  Fio.FileHelper.get_files(train_file_cfg['img-dir'])
     Epi_creator = Fio.EPIcreator(files)
-    Epi_creator.create((45, 53))
+    Epi_creator.create((36, 44))
 
 #batch-data
-def batch_data(tdc=train_data_cfg):
+def get_data(tdc=train_file_cfg):
     '''
-    function:to generante batch Object for use next_batch() API\n
-    @tdc:train data configure object
+    function:to get data\n
+    @tdc:train data configure object\n
+    return:BatchHelper obj
     '''
     #得到排序后的图片文件列表
     origin_epi_list = Fio.FileHelper.get_files(tdc['origin-epi-dir'])
@@ -52,12 +60,31 @@ def batch_data(tdc=train_data_cfg):
             epi_list.append(epi)
     #load labels
     LabelLoader = Fio.TextLoader()
-    labels = LabelLoader.read(train_data_cfg['label-dir'], float)
+    labels = LabelLoader.read(train_file_cfg['label-dir'], float)
     labels = np.array(labels)#转为numpy.ndarray类型数据
     assert len(labels) == len(epi_list)#check
-    data_batch = Fut.BatchHelper((epi_list, labels))
     print 'generate batch done!'
-    return data_batch
+    return Fut.BatchHelper((epi_list, labels))
+
+def bh_data(data):
+    bh = Fut.BatchHelper(data)
+    return bh
+
+def data():
+    '''
+    provide data
+    '''
+    bh = get_data()
+    bh.shuffle(5)#乱序5次
+    new_data = bh.get_data()
+    images, labels = new_data[0], new_data[1]
+    num_tr = data_cfg['train']
+    num_vf = data_cfg['verify']+num_tr
+    num_te = data_cfg['test']+num_vf
+    train_bh = Fut.BatchHelper((images[0:num_tr], labels[0:num_tr]))
+    verify_bh = Fut.BatchHelper((images[num_tr:num_vf], labels[num_tr:num_vf]))
+    test_bh = Fut.BatchHelper((images[num_vf:num_te], labels[num_vf:num_te]))
+    return train_bh, verify_bh, test_bh
 
 def placeholder_inputs(batch_size):
     '''

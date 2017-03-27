@@ -18,7 +18,7 @@ git clone https://github.com/ffun/LFDL.git
 #配置文件
 train_data_cfg = {
     'img-dir':'/Users/fang/workspaces/tf_space/box',
-    'origin-epi-dir':'/Users/fang/workspaces/tf_space/box/epi45_53',
+    'origin-epi-dir':'/Users/fang/workspaces/tf_space/box/epi36_44',
     'label-dir':'/Users/fang/workspaces/tf_space/LFDL/disp.txt'
 }
 #img 配置文件
