@@ -66,16 +66,12 @@ def get_data(tdc=train_file_cfg):
     print 'generate batch done!'
     return Fut.BatchHelper((epi_list, labels))
 
-def bh_data(data):
-    bh = Fut.BatchHelper(data)
-    return bh
-
 def data():
     '''
     provide data
     '''
     bh = get_data()
-    bh.shuffle(5)#乱序5次
+    bh.shuffle(10)#乱序10次
     new_data = bh.get_data()
     images, labels = new_data[0], new_data[1]
     num_tr = data_cfg['train']
@@ -94,14 +90,14 @@ def placeholder_inputs(batch_size):
         batch_size: The batch size will be baked into both placeholders.
 
     Returns:
-        images_placeholder: Images placeholder.
-        labels_placeholder: Labels placeholder.
+        images_pl: Images placeholder.
+        labels_pl: Labels placeholder.
     '''
     H, W, C = epi_cfg['height'], epi_cfg['width'], epi_cfg['channel']
-    epi_img_placeholder = tf.placeholder(tf.float32, shape=(batch_size, H, W, C))
-    labels_placeholder = tf.placeholder(tf.float32, shape=(batch_size))
-    keep_prob_placeholder = tf.placeholder('float')
-    return epi_img_placeholder, labels_placeholder, keep_prob_placeholder
+    images_pl = tf.placeholder(tf.float32, shape=(batch_size, H, W, C))
+    labels_pl = tf.placeholder(tf.float32, shape=(batch_size))
+    keep_prob_pl = tf.placeholder('float')
+    return images_pl, labels_pl, keep_prob_pl
 
 def fill_feed_dict(data_set, images_pl, labels_pl, prob_pl, mode='train'):
     '''
