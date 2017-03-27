@@ -20,8 +20,8 @@ def run_train(max_steps):
         init_op = tf.global_variables_initializer()
         saver = tf.train.Saver()
         with tf.Session() as sess:
-            start_time = time.time()
             sess.run(init_op)
+            start_time = time.time()
             for step in xrange(max_steps):
                 feed_dict = ffun_data.fill_feed_dict(data_sets.next_batch(50), 
                 images_placeholder, labels_placeholder, keep_prop_placeholder, mode='train')
