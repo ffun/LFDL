@@ -245,7 +245,7 @@ class NetCalculator(object):
             break
         num = num * batch_size
         return num
-    def all_memort_cost(self, batch_size=1):
+    def all_memory_cost(self, batch_size=1):
         '''
         stat all memory cost of the net when training
         '''

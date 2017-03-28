@@ -7,15 +7,15 @@ from ffun.util import *
 import ffun_net
 import ffun_data
 
-model_dir = '/Users/fang/workspaces/tf_space/model'
-eval_region = 0.07
+#配置文件
+Train_CFG = {
+    'model_dir':'/Users/fang/workspaces/tf_space/model',
+    'eval_region': 0.07,
+    'batch-size':50
+}
 
-def do_eval(sess, dataset):
-    #get placeholder
-    images_pl, labels_pl, prop_pl = ffun_data.placeholder_inputs(dataset.batch_size())
-    #get inference
-    inference = ffun_net.infer(images_pl, prop_pl)
-    eval_correct = ffun_net.eval(inference, labels_pl, eval_region)
+# 准确率计算
+def do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, dataset):
     true_count = 0
     step_per_epoch = dataset.num() // dataset.batch_size()
     for step in xrange(step_per_epoch):
@@ -23,7 +23,8 @@ def do_eval(sess, dataset):
         feed_fict = ffun_data.fill_feed_dict(dataset.next_batch(), \
         images_pl, labels_pl,  prop_pl, mode='test')
         #run
-        true_count += sess.run(eval_correct, feed_fict=feed_fict)
+        diff = sess.run(eval_correct, feed_dict=feed_fict)
+        true_count += SeqHelper.stat_seq(diff[0], Train_CFG['eval_region'])
     #准确率
     precision = float(true_count)/dataset.num()
     print 'num_examples:%d,correct:%d,precision:%0.04f' % (dataset.num(), true_count, precision)
@@ -32,15 +33,20 @@ def run_train(max_steps):
     '''
     run train
     '''
-    #get data
+    #get data:训练集，验证集合测试集
     tr_bh, vf_bh, te_bh = ffun_data.data()
-    train_bh, verify_bh, test_bh = DataSet(tr_bh), DataSet(tr_bh, 1000), DataSet(te_bh, 1000)
+    #get batch_size
+    bs = Train_CFG['batch-size']
+    #get DataSet
+    train_bh, verify_bh, test_bh = DataSet(tr_bh, bs), DataSet(tr_bh, bs), DataSet(te_bh, bs)
     #graph
     with tf.Graph().as_default():
         #get placeholder
         images_pl, labels_pl, prop_pl = ffun_data.placeholder_inputs(train_bh.batch_size())
         #get inference
         inference = ffun_net.infer(images_pl, prop_pl)
+        #correct eval
+        eval_correct = ffun_net.eval(inference, labels_pl)
         #get loss
         loss = ffun_net.loss(inference, labels_pl)
         #get train op
@@ -62,17 +68,15 @@ def run_train(max_steps):
                 #print the message
                 if step % 100 == 0:
                     print 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
-                    print 'Validation Data Eval:'
-                    do_eval(sess, verify_bh)
                 #Save a checkpoint and evaluate the model periodically.
-                if (step) % 5000 == 0 or (step + 1) == max_steps:
-                    checkpoint_file = os.path.join(model_dir, 'ffunNet_model.ckpt')
+                if (step+1) % 5000 == 0 or (step+1) == max_steps:
+                    checkpoint_file = os.path.join(Train_CFG['model_dir'], 'ffunNet_model.ckpt')
                     saver.save(sess, checkpoint_file, global_step=step)
                     #eval
                     print 'Validation Data Eval:'
-                    do_eval(sess, verify_bh)
+                    do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, verify_bh)
                     print 'Test Data Eval:'
-                    do_eval(sess, test_bh)
+                    do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, test_bh)
     pass
 
 if __name__ == '__main__':

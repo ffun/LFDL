@@ -70,7 +70,7 @@ def train(loss, lr):
     train_op = optimizer.minimize(loss, global_step=global_step)
     return train_op
 
-def eval(inference, labels, region):
+def eval(inference, labels):
     '''
     function to evaluation the DL model\n
     @inference:inference tensor from infer()\n
@@ -78,7 +78,9 @@ def eval(inference, labels, region):
     '''
     diff = tf.sub(inference, labels)
     diff = tf.abs(diff)
-    correct = 0
+    '''
     if diff < region:
         correct = 1
     return tf.reduce_sum(correct)
+    '''
+    return diff

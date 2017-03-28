@@ -51,10 +51,11 @@ nc.add_fc_layer([128*5*6,1024])
 nc.print_layers()
 print 'layer num:',nc.num_of_layers()
 #输出内存消耗(单位为参数个数)。需要根据每个点的数据类型(比如int,float)重新换算
+#以下4个函数，默认batch-size=1情况下的消耗，可以传入一个参数表示batch-size
 print 'weight_memery_cost:',nc.weight_memery_cost()
 print 'hidden_memory_cost:',nc.hidden_memory_cost()
 print 'data_memory_cost:',nc.data_memory_cost()
-print 'all_memort_cost:',nc.all_memort_cost()
+print 'all_memort_cost:',nc.all_memory_cost()
 ```
 
 输出的信息类似如下（output行在输出时会显示为绿色）：

@@ -58,12 +58,16 @@ def get_data(tdc=train_file_cfg):
         for j in xrange(img_cfg['width']):
             epi = Extractor.extract(j, epi_cfg['width'])
             epi_list.append(epi)
+    print 'generate epi done!'
     #load labels
     LabelLoader = Fio.TextLoader()
     labels = LabelLoader.read(train_file_cfg['label-dir'], float)
+    #对label进行偏移,label->[-2,2],new_labels->[]
+    labels = map(lambda x:x+2,labels)
+    print 'load labels done!'
     labels = np.array(labels)#转为numpy.ndarray类型数据
     assert len(labels) == len(epi_list)#check
-    print 'generate batch done!'
+    print 'generate data done!'
     return Fut.BatchHelper((epi_list, labels))
 
 def data():
