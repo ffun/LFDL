@@ -21,7 +21,7 @@ class BatchHelper(object):
         '''
         self.m_items = m_items
         self.__check()#校验，确保正确
-        self.index = [i for i in range(len(self.m_items[0]))]
+        self.index = range(len(self.m_items[0]))#generate a list
         self.front = 0
         self.end = len(m_items[0])#self.end point to the end of seq
     def __check(self):
@@ -127,3 +127,32 @@ class BatchHelper(object):
                 batch_part.append(elem)
             batch.append(batch_part)
         return tuple(batch)
+
+    def num(self):
+        return len(self.index)
+
+class DataSet(object):
+    '''
+    DataSet object\n
+    A Wrap of BatchHelper
+    '''
+    def __init__(self, bh, bz=50):
+        self.bh = bh
+        self.bz = bz
+    def num(self):
+        '''
+        funtion to get number of data elements
+        '''
+        return self.bh.num()
+    def set_bz(self, bz):
+        '''
+        function to set batch-size
+        '''
+        self.bz = bz
+    def batch_size(self):
+        '''
+        funtion to get batch-size
+        '''
+        return self.bz
+    def next_batch(self):
+        return self.bh.next_batch(self.bz)
