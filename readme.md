@@ -18,7 +18,7 @@ git clone https://github.com/ffun/LFDL.git
 #配置文件
 train_data_cfg = {
     'img-dir':'/Users/fang/workspaces/tf_space/box',
-    'origin-epi-dir':'/Users/fang/workspaces/tf_space/box/epi45_53',
+    'origin-epi-dir':'/Users/fang/workspaces/tf_space/box/epi36_44',
     'label-dir':'/Users/fang/workspaces/tf_space/LFDL/disp.txt'
 }
 #img 配置文件
@@ -34,6 +34,13 @@ epi_cfg = {
     'channel':3,
     'mode':'c=0'
 }
+#配置文件:训练、验证、测试集的数量
+data_cfg = {
+    'all':512*512,
+    'train':200000,
+    'verify':40000,
+    'test':22000
+}
 ```
 
 请修改`train_data_cfg['img-dir']`的值为box解压的绝对路径，然后运行`python ffun_data.py`产生原始epi文件。接着，把原始epi文件所在目录的绝对路径填入`train_data_cfg['origin-epi-dir']`的值  
@@ -42,28 +49,26 @@ epi_cfg = {
 打开`ffun_train.py`文件，修改model_dir的值，它表示训练好的模型要存放在哪个地方。你还可以在文件中修改迭代的次数，学习率等等。  
 
 ```python
-model_dir = '/Users/fang/workspaces/tf_space/model'
+#配置文件
+Train_CFG = {
+    'model_dir':'/Users/fang/workspaces/tf_space/model',
+    'eval_region': 0.07,
+    'batch-size':100
+}
 ```  
 
 3. 一切就绪  
 运行`python ffun_train.py`开始训练网络。大致会显示如下信息：
 
 ```bash
-Step 1800: loss = 102298310052023873715568640.00 (406.326 sec)
-Step 1900: loss = 68546643685122870750478336.00 (428.306 sec)
+generate epi done!
+load labels done!
+generate data done!
+Step 0: loss = 5.24 (0.132 sec)
+Step 100: loss = 1.44 (11.945 sec)
+Step 200: loss = 1.41 (22.117 sec)
+Step 300: loss = 1.11 (32.315 sec)
 ······
-Step 10400: loss = 113548214272.00 (2416.193 sec)
-Step 10500: loss = 76084084736.00 (2440.081 sec)
-······
-Step 15500: loss = 151.48 (3648.776 sec)
-Step 15600: loss = 104.22 (3671.850 sec)
-······
-Step 16400: loss = 5.82 (3870.151 sec)
-Step 16500: loss = 3.65 (3895.443 sec)
-······
-Step 19100: loss = 0.60 (4519.097 sec)
-Step 19200: loss = 0.59 (4543.488 sec)
-····
 ```
 
 可以看到Loss一直在减小，由于是在Mac上使用i5 CPU处理，所以速度比较慢(而且随着迭代次数增加而变慢)。  
@@ -74,8 +79,8 @@ Step 19200: loss = 0.59 (4543.488 sec)
 
 5. 修改与扩展  
     1. 注意：当你修改`ffun_data.py`中的配置文件，包括`img_cfg`、`epi_cfg`时，这会改变输入数据的尺寸。此时，你可能需要重新设计卷积尺寸，以及计算出卷积后全连接时的神经元个数，并打开`ffun_net.py`文件修改相关的参数。  
-    2. 如果要自定义网络结构，则修改`ffun_net.py`中`infer()`、`loss()`的实现即可(函数名不需要修改)，还可以修改`train()`中的`optimizer`不同的参数更新的方法(在本代码中使用的是简单梯度下降方式)  
-    3. `ffun_train.py`文件内只有一个`run_train()`函数，该函数的作用类似于[***Caffe Framework***][caffe-link]中`Sovler`，主要在其中控制迭代次数、保存模型、测试等。还有就是给网络喂`feed_dict`(tensorflow特有的两种传递参数的方式之一)。
+    2. 如果要自定义网络结构，则修改`ffun_net.py`中`infer()`、`loss()`、`eval()`的实现即可(函数名不需要修改)，还可以修改`train()`中的`optimizer`不同的参数更新的方法(在本代码中使用的是简单梯度下降方式)  
+    3. `ffun_train.py`文件内有一个`run_train()`函数，该函数的作用类似于[***Caffe Framework***][caffe-link]中`Sovler`，主要在其中控制迭代次数、保存模型、测试等。还有就是给网络喂`feed_dict`(tensorflow特有的两种传递参数的方式之一)。此外还有一个`do_eval()`函数是用于做模型评估的。
     4. 其他的扩展和修改请深入学习tensorflow  
 
 6. 本代码结构参照tensorflow的mnist例子而写，但是网络模型、训练细节等方面有一些不同。tensorflow mnist代码链接：[**mnist.py**][mnist-code]、[**fully_connected_feed.py**][fully_connected_feed-code]

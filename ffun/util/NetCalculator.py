@@ -96,8 +96,8 @@ class NetCalculator(object):
         #check in_channel
         assert in_channel == Ci
         #compute output shape,(H,W,C)
-        H0 = (Hi + 2*padding - Kh)/StrideKh + 1
-        W0 = (Wi + 2*padding - Kw)/StrideKw + 1
+        H0 = (Hi + 2*padding - Kh)//StrideKh + 1
+        W0 = (Wi + 2*padding - Kw)//StrideKw + 1
         #add layer and shape
         name = 'conv'+ str(self.layer_stat['conv']+1)
         layer = self.__build(name, ksize, strides)
@@ -121,8 +121,8 @@ class NetCalculator(object):
         #获取末尾shape
         Hi, Wi, Ci = self.last_shape()
         #compute output shape,(H,W,C)
-        H0 = (Hi + 2*padding - Kh)/StrideKh + 1
-        W0 = (Wi + 2*padding - Kw)/StrideKw + 1
+        H0 = (Hi + 2 * padding - Kh) // StrideKh + 1
+        W0 = (Wi + 2 * padding - Kw) // StrideKw + 1
         #add layer and shape
         name = 'pool'+ str(self.layer_stat['pool']+1)
         layer = self.__build(name, ksize, strides)
@@ -245,7 +245,7 @@ class NetCalculator(object):
             break
         num = num * batch_size
         return num
-    def all_memort_cost(self, batch_size=1):
+    def all_memory_cost(self, batch_size=1):
         '''
         stat all memory cost of the net when training
         '''

@@ -15,3 +15,10 @@ class SeqHelper(object):
             if math.fabs(seq1[i] - seq2[i]) < prec:
                 num = num + 1
         return num
+    @classmethod
+    def stat_seq(cls, seq, prec):
+        num = 0
+        for i in xrange(len(seq)):
+            if seq[i] < prec:
+                num += 1
+        return num
