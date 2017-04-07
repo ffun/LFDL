@@ -51,7 +51,7 @@ def do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, dataset):
     eval_info = 'num_examples:%d,correct:%d,precision:%0.04f' % (dataset.num(), true_count, precision)
     print eval_info
     #logging
-    Logger.log(eval_info)
+    Logger.log(eval_info+'\n')
 
 def run_train(max_steps):
     '''
@@ -62,7 +62,7 @@ def run_train(max_steps):
     #get batch_size
     bs = Train_CFG['batch-size']
     #get DataSet
-    train_bh, verify_bh, test_bh = DataSet(tr_bh, bs), DataSet(tr_bh, bs), DataSet(te_bh, bs)
+    train_bh, verify_bh, test_bh = DataSet(tr_bh, bs), DataSet(vf_bh, bs), DataSet(te_bh, bs)
     #graph
     with tf.Graph().as_default():
         #get placeholder
@@ -74,7 +74,7 @@ def run_train(max_steps):
         #get loss
         loss = ffun_net.loss(inference, labels_pl)
         #get train op
-        train_op = ffun_net.train(loss, 1e-3)
+        train_op = ffun_net.train(loss, 1e-4)
         #init op
         init_op = tf.global_variables_initializer()
         #saver
@@ -90,21 +90,24 @@ def run_train(max_steps):
                 _, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
                 duration = time.time() - start_time
                 #print the message
-                if step % 100 == 0:
+                if step % 1000 == 0:
                     tran_info = 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
                     print tran_info
-                    Logger.log(tran_info)#logging
+                    Logger.log(tran_info+'\n')#logging
                 
                 #Save a checkpoint and evaluate the model periodically.
-                if (step+1) % 10000 == 0 or (step+1) == max_steps:
+                if (step+1) % 100000 == 0 or (step+1) == max_steps:#每10w次评估下
                     checkpoint_file = os.path.join(Train_CFG['model_dir'], 'ffunNet_model.ckpt')
                     saver.save(sess, checkpoint_file, global_step=step)
+                    #validation feed
                     #eval
                     print 'Validation Data Eval:'
                     do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, verify_bh)
+                    #test feed
+
                     print 'Test Data Eval:'
                     do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, test_bh)
     pass
 
 if __name__ == '__main__':
-    run_train(30000)
+    run_train(500000)#训练50w次
