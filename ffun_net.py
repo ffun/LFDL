@@ -75,7 +75,8 @@ def train(loss, lr):
     @lr:The learning rate to use for gradient descent
     '''
     # Create the gradient descent optimizer with the given learning rate.
-    optimizer = tf.train.GradientDescentOptimizer(lr)
+    #optimizer = tf.train.GradientDescentOptimizer(lr)
+    optimizer = tf.train.AdamOptimizer(lr, 0.9, 0.995)
     # Create a variable to track the global step
     global_step = tf.Variable(0, name='global_step', trainable=False)
     # Use the optimizer to apply the gradients that minimize the loss
