@@ -14,6 +14,30 @@ Train_CFG = {
     'batch-size':50
 }
 
+#计数器，使用闭包实现
+def Counter(cnt=0):
+    num = [0]
+    num[0] = cnt
+    def count():
+        num[0] += 1
+        return num[0]
+    return count
+
+class Logger(object):
+    counter = Counter()
+    @classmethod
+    def log(cls, info):
+        logpath = Train_CFG['model_dir']+'/log.txt'
+        f = None#定义文件句柄
+        if(cls.counter() == 1):
+            f = open(logpath, 'w')#第一打开文件，写覆盖的方式打开文件
+        else:
+            f = open(logpath, 'a')#以追加的形式打开文件
+        f.write(info)#写数据
+        #关闭文件
+        if f.closed is False:
+            f.close()
+
 # 模型评估
 def do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, dataset):
     true_count = 0.0
@@ -29,11 +53,14 @@ def do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, dataset):
         true_count += SeqHelper.stat_seq(diff[0], Train_CFG['eval_region'])
         '''
         #分类准确率计算
-        true_count += sess.run(eval_correct, feed_fict=feed_dict)
+        true_count += sess.run(eval_correct, feed_dict=feed_dict)
     #准确率
     precision = float(true_count)/dataset.num()
 
-    print 'num_examples:%d,correct:%d,precision:%0.04f' % (dataset.num(), true_count, precision)
+    eval_info = 'num_examples:%d,correct:%d,precision:%0.04f' % (dataset.num(), true_count, precision)
+    print eval_info
+    #logging
+    Logger.log(eval_info)
 
 def run_train(max_steps):
     '''
@@ -73,9 +100,12 @@ def run_train(max_steps):
                 duration = time.time() - start_time
                 #print the message
                 if step % 100 == 0:
-                    print 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
+                    tran_info = 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
+                    print tran_info
+                    Logger.log(tran_info)#logging
+                
                 #Save a checkpoint and evaluate the model periodically.
-                if (step+1) % 5000 == 0 or (step+1) == max_steps:
+                if (step+1) % 10000 == 0 or (step+1) == max_steps:
                     checkpoint_file = os.path.join(Train_CFG['model_dir'], 'ffunNet_model.ckpt')
                     saver.save(sess, checkpoint_file, global_step=step)
                     #eval
