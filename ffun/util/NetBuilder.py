@@ -5,7 +5,6 @@ author:fang.junpeng\n
 email:tfzsll@126.com\n
 '''
 import tensorflow as tf
-from Checker import Checker
 
 class Layer(object):
     '''

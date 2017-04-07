@@ -7,6 +7,7 @@ import tensorflow as tf
 import ffun.util as Fut
 import ffun.io as Fio
 import numpy as np
+import sys, getopt
 
 #配置文件
 train_file_cfg = {
@@ -37,9 +38,22 @@ data_cfg = {
 
 #generate origin epi data
 def epi_data_generate():
+    print 'Start gengerating EPI Files'
     files =  Fio.FileHelper.get_files(train_file_cfg['img-dir'])
     Epi_creator = Fio.EPIcreator(files)
     Epi_creator.create((36, 44))
+
+def label_trans(x, c=58):
+    '''
+    function to transform float label to int
+    '''
+    r = (x+2)*c/4
+    r = int(r)
+    if r > 58:
+        r = 58
+    elif r < 0:
+        r = 0
+    return r
 
 #batch-data
 def get_data(tdc=train_file_cfg):
@@ -48,6 +62,13 @@ def get_data(tdc=train_file_cfg):
     @tdc:train data configure object\n
     return:BatchHelper obj
     '''
+    #load labels
+    LabelLoader = Fio.TextLoader()
+    labels = LabelLoader.read(train_file_cfg['label-dir'], float)
+    #对label进行偏移,label->[-2,2],new_labels->[0,4],并且进行离散化成58个类
+    labels = map(label_trans, labels)#make it 58 classes between [0,4]
+    print 'load labels done!'
+    labels = np.array(labels)#转为numpy.ndarray类型数据
     #得到排序后的图片文件列表
     origin_epi_list = Fio.FileHelper.get_files(tdc['origin-epi-dir'])
     epi_list = []
@@ -59,13 +80,6 @@ def get_data(tdc=train_file_cfg):
             epi = Extractor.extract(j, epi_cfg['width'])
             epi_list.append(epi)
     print 'generate epi done!'
-    #load labels
-    LabelLoader = Fio.TextLoader()
-    labels = LabelLoader.read(train_file_cfg['label-dir'], float)
-    #对label进行偏移,label->[-2,2],new_labels->[]
-    labels = map(lambda x:x+2,labels)
-    print 'load labels done!'
-    labels = np.array(labels)#转为numpy.ndarray类型数据
     assert len(labels) == len(epi_list)#check
     print 'generate data done!'
     return Fut.BatchHelper((epi_list, labels))
@@ -99,7 +113,12 @@ def placeholder_inputs(batch_size):
     '''
     H, W, C = epi_cfg['height'], epi_cfg['width'], epi_cfg['channel']
     images_pl = tf.placeholder(tf.float32, shape=(batch_size, H, W, C))
+    '''
+    # 回归任务
     labels_pl = tf.placeholder(tf.float32, shape=(batch_size))
+    '''
+    # 分类任务
+    labels_pl = tf.placeholder(tf.int32, shape=(batch_size))
     keep_prob_pl = tf.placeholder('float')
     return images_pl, labels_pl, keep_prob_pl
 
@@ -114,7 +133,7 @@ def fill_feed_dict(data_set, images_pl, labels_pl, prob_pl, mode='train'):
     data = data_set
     images_feed, labels_feed = data[0], data[1]
     prop = 0.5
-    if cmp(mode, 'test'):#if test phase
+    if mode == 'test':#if test phase
         prop = 1.0
     feed_dict = {
       images_pl: images_feed,
@@ -123,5 +142,24 @@ def fill_feed_dict(data_set, images_pl, labels_pl, prob_pl, mode='train'):
     }
     return feed_dict
 
+def usage():
+    nl = '\n'
+    usage_str = 'OVERVIEW: ffun_data tool'+nl
+    usage_str += nl + 'usage:' +nl
+    usage_str += 'ffun_data.py [options] <inputs>'+nl
+    usage_str += nl+'OPTIONS:'+nl
+    usage_str += '-h    >>> to get help of this program\n'
+    usage_str += '--epi >>> to generate origin epi files'
+    print usage_str
+
 if __name__ == '__main__':
-    epi_data_generate()
+    opts, _ = getopt.getopt(sys.argv[1:], "h", ['epi'])
+    #epi_data_generate()
+    for op, value in opts:
+        if op == 'epi':
+            epi_data_generate()
+        else:
+            usage()
+            sys.exit()
+    if len(opts) == 0:
+        usage()

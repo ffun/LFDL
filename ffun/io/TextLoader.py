@@ -33,4 +33,4 @@ class TextLoader(object):
                 #if transform Function is not None,do transform
                 for i in xrange(len(data)):
                     d.append(transform(data[i]))
-        return tuple(d)
+        return d
