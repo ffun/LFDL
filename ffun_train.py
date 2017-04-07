@@ -14,19 +14,25 @@ Train_CFG = {
     'batch-size':50
 }
 
-# 准确率计算
+# 模型评估
 def do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, dataset):
-    true_count = 0
-    step_per_epoch = dataset.num() // dataset.batch_size()
-    for step in xrange(step_per_epoch):
+    true_count = 0.0
+    step_epochs = dataset.num() // dataset.batch_size()
+    for step in xrange(step_epochs):
         #get feed_dict
-        feed_fict = ffun_data.fill_feed_dict(dataset.next_batch(), \
+        feed_dict = ffun_data.fill_feed_dict(dataset.next_batch(), \
         images_pl, labels_pl,  prop_pl, mode='test')
         #run
+        '''
+        #回归准确率计算
         diff = sess.run(eval_correct, feed_dict=feed_fict)
         true_count += SeqHelper.stat_seq(diff[0], Train_CFG['eval_region'])
+        '''
+        #分类准确率计算
+        true_count += sess.run(eval_correct, feed_fict=feed_dict)
     #准确率
     precision = float(true_count)/dataset.num()
+
     print 'num_examples:%d,correct:%d,precision:%0.04f' % (dataset.num(), true_count, precision)
 
 def run_train(max_steps):
