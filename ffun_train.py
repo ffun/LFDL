@@ -24,19 +24,10 @@ def Counter(cnt=0):
     return count
 
 class Logger(object):
-    counter = Counter()
     @classmethod
-    def log(cls, info):
-        logpath = Train_CFG['model_dir']+'/log.txt'
-        f = None#定义文件句柄
-        if(cls.counter() == 1):
-            f = open(logpath, 'w')#第一打开文件，写覆盖的方式打开文件
-        else:
-            f = open(logpath, 'a')#以追加的形式打开文件
-        f.write(info)#写数据
-        #关闭文件
-        if f.closed is False:
-            f.close()
+    def log(cls, info, logpath=Train_CFG['model_dir']+'/log.txt'):
+        with open(logpath, 'a') as f:
+            f.write(info)
 
 # 模型评估
 def do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, dataset):
