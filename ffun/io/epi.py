@@ -107,9 +107,9 @@ class EPIextractor(object):
         shape = self.im_array.shape
         width = shape[1]#获得宽度
         v = 0
-        if cmp('c', mode[0]):#constant mode
+        if mode[0] == 'c':#constant mode
             v = int(mode[2])
-        elif cmp('m', mode[0]):#mirror mode,not realize
+        elif mode[0] == 'm':#mirror mode,not realize
             pass
         nd = np.zeros([shape[0], shape[1]+pad_num*2, shape[2]])
         nd[:, pad_num:shape[1]+pad_num:, :] = self.im_array# copy the data into padded area

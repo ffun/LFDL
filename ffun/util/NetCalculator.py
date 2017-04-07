@@ -250,4 +250,5 @@ class NetCalculator(object):
         stat all memory cost of the net when training
         '''
         num = self.weight_memery_cost()+self.hidden_memory_cost()+self.data_memory_cost()
+        num *= batch_size
         return num
