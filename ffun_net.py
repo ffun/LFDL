@@ -31,7 +31,7 @@ def infer(images, keep_prob):
     h_pool2 = Layer.pool(h_conv2, ksize=[1, 1, 2, 1], strides=[1, 1, 2, 1])
 
     #w_fc1
-    w_fc1 = Layer.weight_variable([5*6*128, 1024],stddev=1.0/math.sqrt(5*6*127))
+    w_fc1 = Layer.weight_variable([5*6*128, 1024], stddev=1.0/math.sqrt(5*6*127))
     b_fc1 = Layer.weight_variable([1024])
 
     h_pool2_flat = tf.reshape(h_pool2, [-1, 5*6*128])

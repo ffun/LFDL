@@ -43,14 +43,14 @@ def epi_data_generate():
     Epi_creator = Fio.EPIcreator(files)
     Epi_creator.create((36, 44))
 
-def label_trans(x, c=58):
+def label_trans(x, class_num=58):
     '''
     function to transform float label to int
     '''
-    r = (x+2)*c/4
+    r = (x+2)*class_num/4
     r = int(r)
-    if r > 58:
-        r = 58
+    if r > class_num:
+        r = class_num
     elif r < 0:
         r = 0
     return r
