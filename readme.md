@@ -43,7 +43,7 @@ data_cfg = {
 }
 ```
 
-请修改`train_data_cfg['img-dir']`的值为box解压的绝对路径，然后运行`python ffun_data.py`产生原始epi文件。接着，把原始epi文件所在目录的绝对路径填入`train_data_cfg['origin-epi-dir']`的值  
+请修改`train_data_cfg['img-dir']`的值为box解压的绝对路径，然后运行`python ffun_data.py --epi`产生原始epi文件。接着，把原始epi文件所在目录的绝对路径填入`train_data_cfg['origin-epi-dir']`的值  
 
 - 配置文件2  
 打开`ffun_train.py`文件，修改model_dir的值，它表示训练好的模型要存放在哪个地方。你还可以在文件中修改迭代的次数，学习率等等。  
