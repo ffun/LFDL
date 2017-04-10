@@ -31,47 +31,58 @@ labels = current[1]#len(label)=5
 
 **提醒**：以上是对加载到内存中的2个序列创建BatchHelper对象，然后进行乱序。然而，当数据足够大时并不能全部加载到内存后再进行乱序。此时，可以生成数据路径的乱序索引文件，然后在训练时对该文件进行加载。  
 
-## NetCalculator  
-该工具是用于研究层级的输出关系，会自动判断参数是否正确，以及计算出每一层的输出shape，提升效率。
-
+## NetHelper 
+- NetHelper用于研究网络层级的输出关系，会自动判断参数是否正确，以及计算出每一层的输出shape。  
+- NetHelper是独立于任何框架的Net描述中间件，随着ffun package的演进，以后也许可以使用NetHelper自动产生tensorflow、Mxnet等框架的代码
 ```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 #导入包
-import ffun.util as Fut
-#创建对象
-nc = Fut.NetCalculator()
-#第一步是设置数据层，否则会报错
-nc.set_dataLayer([9,33,3])
-#添加层信息
-nc.add_conv_layer(ksize=[3, 3, 3, 64])
-nc.add_pool_layer(ksize=[1,1,2,1],strides=[1,1,2,1])
-nc.add_conv_layer(ksize=[3, 3, 64, 128])
-nc.add_pool_layer(ksize=[1,1,2,1],strides=[1,1,2,1])
-nc.add_fc_layer([128*5*6,1024])
-#print messge
-nc.print_layers()
-print 'layer num:',nc.num_of_layers()
+import NetHelper
+#创建Layer对象
+L1 = NetHelper.Data_Layer([9, 33, 3])
+L2 = NetHelper.Conv_Layer([3, 3, 3, 64])
+L3 = NetHelper.Pool_Layer([1, 1, 2, 1], [1, 1, 2, 1])
+L4 = NetHelper.Conv_Layer([3, 3, 64, 128])
+L5 = NetHelper.Pool_Layer([1, 1, 2, 1], [1, 1, 2, 1])
+L6 = NetHelper.Fc_Layer([128*5*6, 1024])
+L7 = NetHelper.Fc_Layer([1024, 58])
+#创建Net并添加Layer,其中Data_Layer必须被第一个添加
+net = NetHelper.Net(L1, L2, L3, L4, L5, L6, L7)#或通过net.add_layer() API添加层
+#打印网络信息
+print net.info()
+#打印网络层数，数据层不算
+print 'layer num:', net.layer_num()
 #输出内存消耗(单位为参数个数)。需要根据每个点的数据类型(比如int,float)重新换算
 #以下4个函数，默认batch-size=1情况下的消耗，可以传入一个参数表示batch-size
-print 'weight_memery_cost:',nc.weight_memery_cost()
-print 'hidden_memory_cost:',nc.hidden_memory_cost()
-print 'data_memory_cost:',nc.data_memory_cost()
-print 'all_memort_cost:',nc.all_memory_cost()
+print 'weight_memery_cost:', net.weight_memery_cost()
+print 'hidden_memory_cost:', net.hidden_memory_cost()
+print 'data_memory_cost:', net.data_memory_cost()
+print 'all_memort_cost:', net.all_memory_cost()
 ```
 
-输出的信息类似如下（output行在输出时会显示为绿色）：
+输出的信息类似如下：
 
 ```bash
-input:[9, 33, 3]
-conv1--ksize:[3, 3, 3, 64];strides:[1, 1, 1, 1]
+Net:
+0.Data_Layer,shape:[9, 33, 3]
+output:[9, 33, 3]
+1.Conv_Layer,shape:[3, 3, 3, 64],stride:[1, 1, 1, 1]
 output:[7, 31, 64]
-pool1--ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
+2.Pool_Layer,shape:[1, 1, 2, 1],stride:[1, 1, 2, 1]
 output:[7, 15, 64]
-conv2--ksize:[3, 3, 64, 128];strides:[1, 1, 1, 1]
+3.Conv_Layer,shape:[3, 3, 64, 128],stride:[1, 1, 1, 1]
 output:[5, 13, 128]
-pool2--ksize:[1, 1, 2, 1];strides:[1, 1, 2, 1]
+4.Pool_Layer,shape:[1, 1, 2, 1],stride:[1, 1, 2, 1]
 output:[5, 6, 128]
-weight_memery_cost: 4012059
-hidden_memory_cost: 33792
+5.Fc_Layer,shape:[3840, 1024]
+output:[1024]
+6.Fc_Layer,shape:[1024, 58]
+output:[58]
+
+layer num: 6
+weight_memery_cost: 4072475
+hidden_memory_cost: 33850
 data_memory_cost: 891
-all_memort_cost: 4046742
+all_memort_cost: 4107216
 ```
