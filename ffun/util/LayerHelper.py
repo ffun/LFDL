@@ -6,19 +6,19 @@ email:tfzsll@126.com\n
 '''
 import tensorflow as tf
 
-class Layer(object):
+class LayerHelper(object):
     '''
     class for easy build net
     '''
     @classmethod
-    def weight_variable(cls, shape, stddev=1e-2, name=None):
+    def weight(cls, shape, stddev=1e-2, name=None):
         '''
         funciton to get weight-param of tf.Variable type
         '''
         initial = tf.truncated_normal(shape, stddev=stddev, name=name)
         return tf.Variable(initial)
     @classmethod
-    def bias_variable(cls, shape, value=1e-2, name=None):
+    def bias(cls, shape, value=1e-2, name=None):
         '''
         funciton to get bias-param of tf.Variable type
         '''

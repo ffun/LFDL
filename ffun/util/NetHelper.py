@@ -73,8 +73,9 @@ class Data_Layer(Layer):
 
 class Pool_Layer(Layer):
     '池化层'
-    def __init__(self, shape, strides=[1, 1, 1, 1], padding=None, name=None):
+    def __init__(self, shape, strides=[1, 1, 1, 1], style='max', padding=None, name=None):
         super(Pool_Layer, self).__init__(shape, strides=strides, padding=None, name=None)
+        self.style = style
     def __str__(self):
         info = super(Pool_Layer, self).__str__()
         info += ',stride:'+str(self.strides)
