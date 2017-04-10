@@ -32,7 +32,7 @@ def infer(images, keep_prob):
 
     #w_fc1
     w_fc1 = LayerHelper.weight([5*6*128, 1024], stddev=1.0/math.sqrt(5*6*127))
-    b_fc1 = LayerHelper.weight([1024])
+    b_fc1 = LayerHelper.bias([1024])
 
     h_pool2_flat = tf.reshape(h_pool2, [-1, 5*6*128])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, w_fc1) + b_fc1)
@@ -43,8 +43,8 @@ def infer(images, keep_prob):
     #w_fc2
     ''' 
     # if use regression
-    w_fc2 = LayerHelper.weight_variable([1024, 1])
-    b_fc2 = LayerHelper.weight_variable([1])
+    w_fc2 = LayerHelper.weight([1024, 1])
+    b_fc2 = LayerHelper.bias([1])
     #output
     inference = tf.matmul(h_fc1_drop, w_fc2) + b_fc2
     '''
