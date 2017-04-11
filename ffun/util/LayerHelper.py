@@ -15,8 +15,8 @@ class LayerHelper(object):
         '''
         funciton to get weight-param of tf.Variable type
         '''
-        initial = tf.truncated_normal(shape, stddev=stddev, name=name)
-        return tf.Variable(initial)
+        initial = tf.truncated_normal(shape, stddev=stddev)
+        return tf.Variable(initial, name=name)
     @classmethod
     def bias(cls, shape, value=1e-2, name=None):
         '''

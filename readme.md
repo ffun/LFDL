@@ -1,9 +1,19 @@
 # LFDL  
 光场阵列相机深度学习.
 
-## ffun
-自己写的一个python package,依赖于PIL,numpy,scipy,tensorflow等。  
-请参照ffun.doc目录下的说明文档
+## ffun  
+依赖于PIL,numpy,tensorflow等而写的一个python package。  
+相关组件(持续更新中)：  
+- EPIcreator  
+根据数据样本产生原始EPI文件  
+- EPIextractor  
+输入原始EPI文件，提取用于训练特定大小的EPI文件  
+- BatchHelper、DataSet  
+支持乱序、next_batch()方法支持循环取数据  
+- NetHelper  
+用于研究网络层级的输出关系，会自动判断参数是否正确，以及计算出每一层的输出shape
+
+详情请参照`ffun/doc`目录下的说明文档
 
 ## ffun-net使用说明  
 1. 下载本代码  
