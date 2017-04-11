@@ -94,20 +94,22 @@ def run_train(max_steps):
                     tran_info = 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
                     print tran_info
                     Logger.log(tran_info+'\n')#logging
-                
                 #Save a checkpoint and evaluate the model periodically.
                 if (step+1) % 100000 == 0 or (step+1) == max_steps:#每10w次评估下
-                    checkpoint_file = os.path.join(Train_CFG['model_dir'], 'ffunNet_model.ckpt')
+                    checkpoint_file = os.path.join(Train_CFG['model_dir'], 'ffun-net.ckpt')
                     saver.save(sess, checkpoint_file, global_step=step)
                     #validation feed
                     #eval
-                    print 'Validation Data Eval:'
+                    eval_info = 'Validation Data Eval:'
+                    Logger.log('Step '+str(step)+':'+eval_info+'\n')
+                    print eval_info
                     do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, verify_bh)
                     #test feed
-
-                    print 'Test Data Eval:'
+                    test_info = 'Test Data Eval:'
+                    Logger.log('Step '+str(step)+':'+test_info+'\n')
+                    print test_info
                     do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, test_bh)
-    pass
+    return
 
 if __name__ == '__main__':
     run_train(500000)#训练50w次
