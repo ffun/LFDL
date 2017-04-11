@@ -7,4 +7,3 @@ from LayerHelper import LayerHelper
 from NetHelper import *
 from Transer import*
 from SeqHelper import*
-import Color_pt

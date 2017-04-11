@@ -14,25 +14,28 @@ def infer(images, keep_prob):
     @images:Images placeholder from ffun_data\n
     @keep_prob:dropout layerHelper's keep_prop
     '''
-    #conv1 para
-    w_conv1 = LayerHelper.weight([3, 3, 3, 64], name="w_conv1")
-    b_conv1 = LayerHelper.bias([64], name="b_conv1")
+    #conv1
+    with tf.name_scope('conv1') as scope:
+        w_conv1 = LayerHelper.weight([3, 3, 3, 64], name="weight")
+        b_conv1 = LayerHelper.bias([64], name="bias")
 
     #hidden1
     h_conv1 = tf.nn.relu(LayerHelper.conv(images, w_conv1, [1, 1, 1, 1]) + b_conv1)
     h_pool1 = LayerHelper.pool(h_conv1, ksize=[1, 1, 2, 1], strides=[1, 1, 2, 1])
 
-    #conv2 para
-    w_conv2 = LayerHelper.weight([3, 3, 64, 128], name="w_conv2")
-    b_conv2 = LayerHelper.bias([128], name="b_conv2")
+    #conv2
+    with tf.name_scope('conv2') as scope:
+        w_conv2 = LayerHelper.weight([3, 3, 64, 128], name="weight")
+        b_conv2 = LayerHelper.bias([128], name="bias")
 
     #hidden2
     h_conv2 = tf.nn.relu(LayerHelper.conv(h_pool1, w_conv2, [1, 1, 1, 1]) + b_conv2)
     h_pool2 = LayerHelper.pool(h_conv2, ksize=[1, 1, 2, 1], strides=[1, 1, 2, 1])
 
-    #w_fc1
-    w_fc1 = LayerHelper.weight([5*6*128, 1024], stddev=1.0/math.sqrt(5*6*127))
-    b_fc1 = LayerHelper.bias([1024])
+    #fc1
+    with tf.name_scope('fc1') as scope:
+        w_fc1 = LayerHelper.weight([5*6*128, 1024], stddev=1.0/math.sqrt(5*6*127), name='weight')
+        b_fc1 = LayerHelper.bias([1024], name='bias')
 
     h_pool2_flat = tf.reshape(h_pool2, [-1, 5*6*128])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, w_fc1) + b_fc1)
@@ -41,16 +44,18 @@ def infer(images, keep_prob):
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
     #w_fc2
-    ''' 
-    # if use regression
-    w_fc2 = LayerHelper.weight([1024, 1])
-    b_fc2 = LayerHelper.bias([1])
+    '''
+    # fc2 if use regression
+    with tf.name_scope('fc2') as scope:
+        w_fc2 = LayerHelper.weight([1024, 1], name='weight')
+        b_fc2 = LayerHelper.bias([1], name='bias')
     #output
     inference = tf.matmul(h_fc1_drop, w_fc2) + b_fc2
     '''
-    # if use classify
-    w_fc2 = LayerHelper.weight([1024, 58], stddev=1.0/math.sqrt(1024))
-    b_fc2 = LayerHelper.bias([58])
+    # fc2 use classify
+    with tf.name_scope('fc2') as scope:
+        w_fc2 = LayerHelper.weight([1024, 58], stddev=1.0/math.sqrt(1024), name='weight')
+        b_fc2 = LayerHelper.bias([58], name='bias')
     inference = tf.matmul(h_fc1_drop, w_fc2) + b_fc2
     return inference
 
