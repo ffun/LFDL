@@ -1,6 +1,12 @@
 # LFDL  
 光场阵列相机深度学习.
 
+## Requirements  
+- Tensorflow1.0  
+- Python2.7  
+- Numpy  
+- PIL(for data generation in EPI EPIcreator)
+
 ## ffun  
 依赖于PIL,numpy,tensorflow等而写的一个python package。  
 相关组件(持续更新中)：  

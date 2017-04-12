@@ -4,7 +4,9 @@
 author:fang.junpeng\n
 email:tfzsll@126.com\n
 '''
+import math
 import tensorflow as tf
+import NetHelper
 
 class LayerHelper(object):
     '''
@@ -49,4 +51,42 @@ class LayerHelper(object):
         elif style == 'avg':
             return tf.nn.avg_pool(x, ksize, strides=strides, padding=padding, name=name)
 
-
+class TfBuilder(NetHelper.NetBuilder):
+    'Tensorflow Net builder'
+    def conv2d(self, x, w_shape, strides, padding, name, initializer_w=None, initializer_b=None):
+        '''
+        convolution layer:
+        Input
+        - x:input tensor
+        - w_shape:weight shape for convolution kernel
+        - strides
+        - padding:'SAME' or 'VALID'
+        - name:variable name scope
+        - initializer_w/b:initializer of weight and bias
+        '''
+        _, _, _, num_out = w_shape
+        with tf.variable_scope(name) as scope:
+            weights = tf.get_variable('weights', w_shape, initializer=initializer_w)
+            biases = tf.get_variable('biased', [num_out], initializer=initializer_b)
+        #conv
+        conv = tf.nn.conv2d(x, weights, strides, padding)
+        #relu
+        relu = tf.nn.relu(conv + biases, name=scope.name)
+        return relu
+    def max_pool(self, x, ksize, strides, padding, name=None):
+        'max pooling layer'
+        return tf.nn.max_pool(x, ksize, strides, padding)
+    def fc(self, x, w_shape, name, relu=True, initializer_w=None, initializer_b=None):
+        'fully connected layer'
+        _, num_out = w_shape
+        with tf.variable_scope(name) as scope:
+            weights = tf.get_variable('weights', w_shape, initializer=initializer_w)
+            biases = tf.get_variable('biased', [num_out], initializer=initializer_b)
+        act = tf.nn.xw_plus_b(x, weights, biases, name=scope.name)
+        if relu:
+            relu = tf.nn.relu(act)
+            return relu
+        return act
+    def dropout(self, x, keep_prop):
+        'keep_prpo layer'
+        return tf.nn.dropout(x, keep_prop)

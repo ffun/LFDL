@@ -39,6 +39,7 @@ labels = current[1]#len(label)=5
 # -*- coding: UTF-8 -*-
 #导入包
 import NetHelper
+#使用方式1
 #创建Layer对象
 L1 = NetHelper.Data_Layer([9, 33, 3])
 L2 = NetHelper.Conv_Layer([3, 3, 3, 64])
@@ -48,7 +49,17 @@ L5 = NetHelper.Pool_Layer([1, 1, 2, 1], [1, 1, 2, 1])
 L6 = NetHelper.Fc_Layer([128*5*6, 1024])
 L7 = NetHelper.Fc_Layer([1024, 58])
 #创建Net并添加Layer,其中Data_Layer必须被第一个添加
-net = NetHelper.Net(L1, L2, L3, L4, L5, L6, L7)#或通过net.add_layer() API添加层
+net = NetHelper.Net(L1, L2, L3, L4, L5, L6, L7)#Net.add_layer() API添加层
+#方式2
+net = NetHelper.Net(
+    NetHelper.Data_Layer([9, 33, 3]),
+    NetHelper.Conv_Layer([3, 3, 3, 64]),
+    NetHelper.Pool_Layer([1, 1, 2, 1], [1, 1, 2, 1]),
+    NetHelper.Conv_Layer([3, 3, 64, 128]),
+    NetHelper.Pool_Layer([1, 1, 2, 1], [1, 1, 2, 1]),
+    NetHelper.Fc_Layer([128*5*6, 1024]),
+    NetHelper.Fc_Layer([1024, 58])
+)
 #打印网络信息
 print net.info()
 #打印网络层数，数据层不算
