@@ -156,9 +156,9 @@ if __name__ == '__main__':
     opts, _ = getopt.getopt(sys.argv[1:], "h", ['epi'])
     #epi_data_generate()
     for op, value in opts:
-        if op == 'epi':
+        if op == '--epi':
             epi_data_generate()
-        else:
+        elif op == '-h':
             usage()
             sys.exit()
     if len(opts) == 0:
