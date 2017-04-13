@@ -3,7 +3,7 @@
 import sys,getopt
 import CFG
 from ffun.EPI import*
-from ffun.DataProvider import*
+from ffun.DataProvider import DataProvider,BatchHelper
 from ffun.FileHelper import*
 from ffun import LabelHelper
 import numpy as np
@@ -113,6 +113,41 @@ def placeholder_inputs(batch_size):
     labels_pl = tf.placeholder(tf.int32, shape=(batch_size))
     keep_prob_pl = tf.placeholder('float')
     return images_pl, labels_pl, keep_prob_pl
+
+class DataSource(DataProvider):
+    'provide data、palceholder and feed_dict'
+    def __init__(self, bh=None, batch_size=50, mode='once'):
+        '''
+        Input:
+        - mode:'once'数据内容一次加载至内存，'part':分步加载至内存
+        '''
+        super(DataSource, self).__init__(bh, batch_size, mode)
+        self.IMAGES_PL = None
+        self.KEEP_PROP_PL = None
+        self.LABELS_PL = None
+    def get_placeholder(self):
+        '获得palceholder'
+        if self.IMAGES_PL and self.KEEP_PROP_PL and self.LABELS_PL:
+            return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
+        H, W, C = CFG.Input_H, CFG.Input_W, CFG.Input_C
+        self.IMAGES_PL = tf.placeholder(tf.float32, shape=(self.batch_size(), H, W, C))
+        self.LABELS_PL = tf.placeholder(tf.int32, shape=(self.batch_size()))
+        self.KEEP_PROP_PL = tf.placeholder('float')
+        return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
+    def get_feeddict(self, mode='train'):
+        '获得feeddict'
+        self.get_placeholder()
+        prop = 0.5
+        if mode == 'test':
+            prop = 1.0
+        images_feed, labels_feed = self.next_batch()#获得数据
+        feed_dict = {
+            self.IMAGES_PL: images_feed,
+            self.LABELS_PL: labels_feed,
+            self.KEEP_PROP_PL: prop
+        }
+        return feed_dict
+
 
 def usage():
     '使用说明'

@@ -3,7 +3,7 @@
 import tensorflow as tf
 from ffunNet import ffunNet
 import CFG
-import ffun_data
+import data
 import time
 import os.path
 from ffun.DataProvider import*
@@ -19,17 +19,18 @@ def run_train(max_steps):
     run train
     '''
     #get data:训练集，验证集合测试集
-    tr_bh, vf_bh, te_bh = ffun_data.data()
+    tr_bh, vf_bh, te_bh = data.data()
     #get batch_size
     bs = CFG.Batch_SIZE
     #get DataSet
-    train_bh, verify_bh, test_bh = DataSet(tr_bh, bs), DataSet(vf_bh, bs), DataSet(te_bh, bs)
-    # Net
+    #train_bh, verify_bh, test_bh = DataSet(tr_bh, bs), DataSet(vf_bh, bs), DataSet(te_bh, bs)
+    train_bh = DataProvider(tr_bh, bs)
+    verify_bh, test_bh = DataProvider(vf_bh, bs), DataProvider(te_bh, bs)
     net = ffunNet(CFG.LR)
     #graph
     with tf.Graph().as_default():
         #get placeholder
-        images_pl, labels_pl, prop_pl = ffun_data.placeholder_inputs(CFG.Batch_SIZE)
+        images_pl, labels_pl, prop_pl = data.placeholder_inputs(CFG.Batch_SIZE)
         #构建网络
         net.build(images_pl, labels_pl, prop_pl)
         train_op = net.train()#train_op一定要在初始化前在计算图中明确定义出，否则会出现未初始化错误
@@ -41,7 +42,7 @@ def run_train(max_steps):
             for i in xrange(max_steps):
                 for step in xrange(CFG.Iter_SIZE):
                     #loss_value = net.run_train(sess, train_bh)
-                    feed_dict = ffun_data.fill_feed_dict(train_bh.next_batch(),\
+                    feed_dict = data.fill_feed_dict(train_bh.next_batch(),\
                     images_pl, labels_pl, prop_pl, mode='train')
                     # run train_op and loss op
                     #_, loss_value = sess.run([train_op,net.loss()], feed_dict=feed_dict)

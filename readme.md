@@ -14,7 +14,7 @@
 根据数据样本产生原始EPI文件  
 - EPIextractor  
 输入原始EPI文件，提取用于训练特定大小的EPI文件  
-- BatchHelper、DataSet  
+- BatchHelper  
 支持乱序、next_batch()方法支持循环取数据  
 - NetHelper  
 用于研究网络层级的输出关系，会自动判断参数是否正确，以及计算出每一层的输出shape
