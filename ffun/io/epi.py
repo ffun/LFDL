@@ -67,7 +67,7 @@ class EPIcreator(object):
         #generate origin epi
         for h in xrange(0, height):
             epi_image = Image.new('RGB', (width, end-start+1), (255, 255, 255))
-            for j in range(start, end+1):
+            for j in xrange(start, end+1):
                 with open(images[j], 'r') as f:
                     im = Image.open(f)
                     for w in xrange(0, width):
