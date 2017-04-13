@@ -2,9 +2,10 @@
 # -*- coding: UTF-8 -*-
 import sys,getopt
 import CFG
-from ffun.epi import*
-from ffun.BatchHelper import*
-from ffun import TextLoader
+from ffun.EPI import*
+from ffun.DataProvider import*
+from ffun.FileHelper import*
+from ffun import LabelHelper
 import numpy as np
 import tensorflow as tf
 
@@ -36,7 +37,7 @@ def get_data():
     return:BatchHelper OBJ
     '''
     #load labels
-    LabelLoader = TextLoader()
+    LabelLoader = LabelHelper()
     #labels = LabelLoader.read(train_file_cfg['label-dir'], float)
     labels = LabelLoader.read(CFG.Label_DIR, float)
     #对label进行偏移,label->[-2,2],new_labels->[0,4],并且进行离散化成58个类
@@ -75,25 +76,6 @@ def data():
     verify_bh = BatchHelper((images[num_tr:num_vf], labels[num_tr:num_vf]))
     test_bh = BatchHelper((images[num_vf:num_te], labels[num_vf:num_te]))
     return train_bh, verify_bh, test_bh
-
-class DataProvider(object):
-    def __init__(self, batch_size=1):
-        self.TRAIN_DATA = None
-        self.VERIFY_DATA = None
-        self.TEST_DATA = None
-        self.BATCH_SIZE = batch_size
-    def load_files(self, data_dir, label_path):
-        pass
-    def funcname(self, parameter_list):
-        pass
-    def get_train_data(self):
-        pass
-    def get_verify_data(self):
-        pass
-    def get_test_data(self):
-        pass
-    def get_data(self):
-        pass
 
 def fill_feed_dict(data_set, images_pl, labels_pl, prob_pl, mode='train'):
     '''

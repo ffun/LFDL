@@ -4,8 +4,8 @@
 本模块主要是为了给网络生成epi文件，以及提供data-batch
 '''
 import tensorflow as tf
-from ffun import TextLoader,FileHelper,BatchHelper
-from ffun.epi import*
+from ffun import LabelHelper,FileHelper,BatchHelper
+from ffun.EPI import*
 import numpy as np
 import sys, getopt
 
@@ -39,8 +39,8 @@ data_cfg = {
 #generate origin epi data
 def epi_data_generate():
     print 'Start gengerating EPI Files'
-    files =  Fio.FileHelper.get_files(train_file_cfg['img-dir'])
-    Epi_creator = Fio.EPIcreator(files)
+    files =  FileHelper.get_files(train_file_cfg['img-dir'])
+    Epi_creator = EPIcreator(files)
     Epi_creator.create((36, 44))
 
 def label_trans(x, class_num=58):
@@ -63,7 +63,7 @@ def get_data(tdc=train_file_cfg):
     return:BatchHelper obj
     '''
     #load labels
-    LabelLoader = TextLoader()
+    LabelLoader = LabelHelper()
     labels = LabelLoader.read(train_file_cfg['label-dir'], float)
     #对label进行偏移,label->[-2,2],new_labels->[0,4],并且进行离散化成58个类
     labels = map(label_trans, labels)#make it 58 classes between [0,4]

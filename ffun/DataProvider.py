@@ -35,7 +35,7 @@ class BatchHelper(object):
         for i in xrange(len(self.m_items)):
             Checker.seq_len_check(self.m_items[i], seq_length)
 
-    def shuffle(self,times=1):
+    def shuffle(self, times=1):
         '''
         shuffle the m_items
         '''
@@ -140,19 +140,41 @@ class DataSet(object):
         self.bh = bh
         self.bz = bz
     def num(self):
-        '''
-        funtion to get number of data elements
-        '''
+        'funtion to get number of data elements'
         return self.bh.num()
     def set_bz(self, bz):
-        '''
-        function to set batch-size
-        '''
+        'function to set batch-size'
         self.bz = bz
     def batch_size(self):
-        '''
-        funtion to get batch-size
-        '''
+        'funtion to get batch-size'
         return self.bz
     def next_batch(self):
+        'get next batch data'
         return self.bh.next_batch(self.bz)
+
+class DataProvider(object):
+    'ffun package的数据组件'
+    def __init__(self, batch_size=50, mode='once'):
+        '''
+        Input:
+        - mode:'once'一次加载至内存，'part':分步加载至内存
+        '''
+        self.TRAIN_DATA = None
+        self.VERIFY_DATA = None
+        self.TEST_DATA = None
+        self.BATCH_SIZE = batch_size
+        self.MODE = mode
+    def load_from_files(self, data_dir, label_path):
+        pass
+    def load_from_bh(self,bh):
+        pass
+    def get_train_data(self):
+        pass
+    def get_verify_data(self):
+        pass
+    def get_test_data(self):
+        pass
+    def next_batch(self):
+        pass
+    def num(self):
+        pass

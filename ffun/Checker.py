@@ -8,8 +8,8 @@ class Checker(object):
     '''
     class for assert value
     '''
-    @classmethod
-    def failed_and_errout(cls, BoolValue, msg):
+    @staticmethod
+    def failed_and_errout(BoolValue, msg):
         '''
         check value and output when False
         '''

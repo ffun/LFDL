@@ -6,7 +6,7 @@ import CFG
 import ffun_data
 import time
 import os.path
-from ffun.BatchHelper import*
+from ffun.DataProvider import*
 
 class Logger(object):
     @staticmethod

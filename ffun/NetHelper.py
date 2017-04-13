@@ -34,7 +34,7 @@ class Layer(object):
         '获得填补数量'
         return self.padding
     def __str__(self):
-        '得到吱声的'
+        '得到自身的toString()'
         info = self.name+',shape:'+str(self.shape)
         return info
     def out_shape(self, in_shape):

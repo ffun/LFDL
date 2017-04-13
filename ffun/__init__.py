@@ -1,7 +1,7 @@
 from LayerHelper import*
 from NetHelper import*
-from TextLoader import *
-from epi import *
+from EPI import *
 from SeqHelper import*
 from Transer import *
-from BatchHelper import *
+from DataProvider import *
+from FileHelper import*

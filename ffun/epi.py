@@ -2,29 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 from PIL import Image
-import os, os.path
+import os,os.path
 import numpy as np
-
-class FileHelper(object):
-    '''
-    class to help deal with folder and File
-    '''
-    @classmethod
-    def get_files(cls, folder, suffix='.png'):
-        '''
-        function:to get all files in the current folder\n
-        return: tuple\n
-        @suffix:file's suffix
-        '''
-        files = []
-        filelist = os.listdir(folder)
-        for f in filelist:
-            if os.path.isfile(folder+'/'+f):
-                filename = folder+'/'+f#get filename
-                if filename.find(suffix) != -1:#filter the file
-                    files.append(filename)
-        files.sort()#对list的内容进行排序
-        return tuple(files)#返回tuple类型
 
 class EPIcreator(object):
     '''
@@ -97,7 +76,6 @@ class EPIextractor(object):
         1)constant mode\n
         'c=0'-->constant and value is 0,'c=1'-->constant and value is 1
         2)mirror mode\n
-        
         '''
         self.pad_num = pad_num
         self.pad_mode = mode
