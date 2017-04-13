@@ -2,16 +2,17 @@
 # -*- coding: UTF-8 -*-
 import sys,getopt
 import CFG
-import ffun.io as Fio
-import ffun.util as Fut
+from ffun.epi import*
+from ffun.BatchHelper import*
+from ffun import TextLoader
 import numpy as np
 import tensorflow as tf
 
 def epi_generate():
     '生成单个样本的原始epi文件'
     print 'gengerating EPI Files'
-    files = Fio.FileHelper.get_files(CFG.Image_DIR)
-    epi_creator = Fio.EPIcreator(files)
+    files = FileHelper.get_files(CFG.Image_DIR)
+    epi_creator = EPIcreator(files)
     epi_creator.create((36, 44))
 
 def epi_patch_generate():
@@ -35,7 +36,7 @@ def get_data():
     return:BatchHelper OBJ
     '''
     #load labels
-    LabelLoader = Fio.TextLoader()
+    LabelLoader = TextLoader()
     #labels = LabelLoader.read(train_file_cfg['label-dir'], float)
     labels = LabelLoader.read(CFG.Label_DIR, float)
     #对label进行偏移,label->[-2,2],new_labels->[0,4],并且进行离散化成58个类
@@ -44,10 +45,10 @@ def get_data():
     labels = np.array(labels)#转为numpy.ndarray类型数据
     #得到排序后的图片文件列表
     #origin_epi_list = Fio.FileHelper.get_files(tdc['origin-epi-dir'])
-    origin_epi_list = Fio.FileHelper.get_files(CFG.EPI_DIR)
+    origin_epi_list = FileHelper.get_files(CFG.EPI_DIR)
     epi_list = []
     for i in xrange(len(origin_epi_list)):
-        Extractor = Fio.EPIextractor(origin_epi_list[i])
+        Extractor = EPIextractor(origin_epi_list[i])
         #给原图像加上padding,这样下面我们就可以提取长度为33的
         Extractor.set_padding(CFG.Input_W)
         #for j in xrange(img_cfg['width']):
@@ -57,7 +58,7 @@ def get_data():
     print 'generate epi done!'
     assert len(labels) == len(epi_list)#check
     print 'generate data done!'
-    return Fut.BatchHelper((epi_list, labels))
+    return BatchHelper((epi_list, labels))
 
 def data():
     '''
@@ -70,9 +71,9 @@ def data():
     num_tr = CFG.Data_TRAIN_NUM
     num_vf = num_tr + CFG.Data_VERIFY_NUM
     num_te = num_vf + CFG.Data_TEST_NUM
-    train_bh = Fut.BatchHelper((images[0:num_tr], labels[0:num_tr]))
-    verify_bh = Fut.BatchHelper((images[num_tr:num_vf], labels[num_tr:num_vf]))
-    test_bh = Fut.BatchHelper((images[num_vf:num_te], labels[num_vf:num_te]))
+    train_bh = BatchHelper((images[0:num_tr], labels[0:num_tr]))
+    verify_bh = BatchHelper((images[num_tr:num_vf], labels[num_tr:num_vf]))
+    test_bh = BatchHelper((images[num_vf:num_te], labels[num_vf:num_te]))
     return train_bh, verify_bh, test_bh
 
 class DataProvider(object):

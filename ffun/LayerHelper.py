@@ -67,7 +67,7 @@ class TfBuilder(NetHelper.NetBuilder):
         _, _, _, num_out = w_shape
         with tf.variable_scope(name) as scope:
             weights = tf.get_variable('weights', w_shape, initializer=initializer_w)
-            biases = tf.get_variable('biased', [num_out], initializer=initializer_b)
+            biases = tf.get_variable('biases', [num_out], initializer=initializer_b)
         #conv
         conv = tf.nn.conv2d(x, weights, strides, padding)
         #relu
@@ -81,7 +81,7 @@ class TfBuilder(NetHelper.NetBuilder):
         _, num_out = w_shape
         with tf.variable_scope(name) as scope:
             weights = tf.get_variable('weights', w_shape, initializer=initializer_w)
-            biases = tf.get_variable('biased', [num_out], initializer=initializer_b)
+            biases = tf.get_variable('biases', [num_out], initializer=initializer_b)
         act = tf.nn.xw_plus_b(x, weights, biases, name=scope.name)
         if relu:
             relu = tf.nn.relu(act)

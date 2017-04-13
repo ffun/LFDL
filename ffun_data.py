@@ -4,8 +4,8 @@
 本模块主要是为了给网络生成epi文件，以及提供data-batch
 '''
 import tensorflow as tf
-import ffun.util as Fut
-import ffun.io as Fio
+from ffun import TextLoader,FileHelper,BatchHelper
+from ffun.epi import*
 import numpy as np
 import sys, getopt
 
@@ -63,17 +63,17 @@ def get_data(tdc=train_file_cfg):
     return:BatchHelper obj
     '''
     #load labels
-    LabelLoader = Fio.TextLoader()
+    LabelLoader = TextLoader()
     labels = LabelLoader.read(train_file_cfg['label-dir'], float)
     #对label进行偏移,label->[-2,2],new_labels->[0,4],并且进行离散化成58个类
     labels = map(label_trans, labels)#make it 58 classes between [0,4]
     print 'load labels done!'
     labels = np.array(labels)#转为numpy.ndarray类型数据
     #得到排序后的图片文件列表
-    origin_epi_list = Fio.FileHelper.get_files(tdc['origin-epi-dir'])
+    origin_epi_list = FileHelper.get_files(tdc['origin-epi-dir'])
     epi_list = []
     for i in xrange(len(origin_epi_list)):
-        Extractor = Fio.EPIextractor(origin_epi_list[i])
+        Extractor = EPIextractor(origin_epi_list[i])
         #给原图像加上padding,这样下面我们就可以提取长度为33的
         Extractor.set_padding(epi_cfg['width']/2, epi_cfg['mode'])
         for j in xrange(img_cfg['width']):
@@ -82,7 +82,7 @@ def get_data(tdc=train_file_cfg):
     print 'generate epi done!'
     assert len(labels) == len(epi_list)#check
     print 'generate data done!'
-    return Fut.BatchHelper((epi_list, labels))
+    return BatchHelper((epi_list, labels))
 
 def data():
     '''
@@ -95,9 +95,9 @@ def data():
     num_tr = data_cfg['train']
     num_vf = data_cfg['verify']+num_tr
     num_te = data_cfg['test']+num_vf
-    train_bh = Fut.BatchHelper((images[0:num_tr], labels[0:num_tr]))
-    verify_bh = Fut.BatchHelper((images[num_tr:num_vf], labels[num_tr:num_vf]))
-    test_bh = Fut.BatchHelper((images[num_vf:num_te], labels[num_vf:num_te]))
+    train_bh = BatchHelper((images[0:num_tr], labels[0:num_tr]))
+    verify_bh = BatchHelper((images[num_tr:num_vf], labels[num_tr:num_vf]))
+    test_bh = BatchHelper((images[num_vf:num_te], labels[num_vf:num_te]))
     return train_bh, verify_bh, test_bh
 
 def placeholder_inputs(batch_size):

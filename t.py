@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import tensorflow as tf
+from ffun.BatchHelper import*
 import os.path
 import time
-from ffun.BatchHelper import*
 import ffun_net
 import ffun_data
+from ffunNet import ffunNet
 
 #配置文件
 Train_CFG = {
@@ -67,14 +68,15 @@ def run_train(max_steps):
     with tf.Graph().as_default():
         #get placeholder
         images_pl, labels_pl, prop_pl = ffun_data.placeholder_inputs(train_bh.batch_size())
+        net = ffunNet(1e-4)
         #get inference
-        inference = ffun_net.infer(images_pl, prop_pl)
-        #correct eval
-        eval_correct = ffun_net.eval(inference, labels_pl)
+        inference = net.build(images_pl, labels_pl, prop_pl)
         #get loss
-        loss = ffun_net.loss(inference, labels_pl)
+        #loss = ffun_net.loss(inference, labels_pl)
+        #loss = net.loss()
         #get train op
-        train_op = ffun_net.train(loss, 1e-4)
+        #train_op = ffun_net.train(loss, 1e-4)
+        train_op = net.train()
         #init op
         init_op = tf.global_variables_initializer()
         #saver
@@ -87,28 +89,14 @@ def run_train(max_steps):
                 feed_dict = ffun_data.fill_feed_dict(train_bh.next_batch(),\
                 images_pl, labels_pl, prop_pl, mode='train')
                 # run train_op and loss op
-                _, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
+                #_, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
+                _, loss_value = sess.run([train_op, net.loss()], feed_dict=feed_dict)
                 duration = time.time() - start_time
                 #print the message
                 if step % 1000 == 0:
                     tran_info = 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
                     print tran_info
                     Logger.log(tran_info+'\n')#logging
-                #Save a checkpoint and evaluate the model periodically.
-                if (step+1) % 100000 == 0 or (step+1) == max_steps:#每10w次评估下
-                    checkpoint_file = os.path.join(Train_CFG['model_dir'], 'ffun-net.ckpt')
-                    saver.save(sess, checkpoint_file, global_step=step)
-                    #validation feed
-                    #eval
-                    eval_info = 'Validation Data Eval:'
-                    Logger.log('Step '+str(step)+':'+eval_info+'\n')
-                    print eval_info
-                    do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, verify_bh)
-                    #test feed
-                    test_info = 'Test Data Eval:'
-                    Logger.log('Step '+str(step)+':'+test_info+'\n')
-                    print test_info
-                    do_eval(sess, eval_correct, images_pl, labels_pl, prop_pl, test_bh)
     return
 
 if __name__ == '__main__':

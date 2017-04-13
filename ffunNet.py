@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import ffun.util as Fut
 import tensorflow as tf
+from ffun.NetHelper import*
+from ffun.LayerHelper import*
 import ffun_data
 
 class ffunNet(object):
@@ -25,7 +26,7 @@ class ffunNet(object):
         self.Eval_OP = None
         self.Infer_OP = None
         # hold a NetBuilder
-        self.builder = Fut.TfBuilder()
+        self.builder = TfBuilder()
     def __check(self):
         'check if the Net is builder'
         if self.Infer_OP is None:
@@ -49,26 +50,33 @@ class ffunNet(object):
         self.LABELS_PL = labels_pl
         builder = self.builder
         # conv layer
-        print images_pl.get_shape()
-        conv1 = builder.conv2d(images_pl, [3, 3, 3, 64], [1, 1, 1, 1], 'VALID', name='conv1')
+        conv1 = builder.conv2d(
+            images_pl,
+            [3, 3, 3, 64],
+            [1, 1, 1, 1],
+            'VALID',
+            name='conv1',
+            initializer_w=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2),
+            initializer_b=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2)
+        )
         # pool layer
-        print conv1.get_shape()
         pool1 = builder.max_pool(conv1, [1, 1, 2, 1], [1, 1, 2, 1], 'VALID', 'pool1')
         # conv layer
-        print pool1.get_shape()
-        conv2 = builder.conv2d(pool1, [3, 3, 64, 128], [1, 1, 1, 1], 'VALID', 'conv2')
+        conv2 = builder.conv2d(
+            pool1, [3, 3, 64, 128], [1, 1, 1, 1], 'VALID', 'conv2',
+            initializer_w=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2),
+            initializer_b=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2)
+            )
         # pool layer
-        print conv2.get_shape()
         pool2 = builder.max_pool(conv2, [1, 1, 2, 1], [1, 1, 2, 1], 'VALID', 'pool2')
         # fc layer
-        print pool2.get_shape()
         flattened = tf.reshape(pool2, [-1, 5*6*128])
-        fc1 = builder.fc(flattened, [5*6*128, 1024], 'fc1')
-        print fc1.get_shape()
+        fc1 = builder.fc(
+            flattened, [5*6*128, 1024], 'fc1',
+        )
         dropout1 = builder.dropout(fc1, keep_prop_pl)
         # fc layer. Disable relu for loss funtion
         fc2 = builder.fc(dropout1, [1024, 58], 'fc2', relu=False)
-        print fc2.get_shape()
         #assign the fc2 to scode
         self.Infer_OP = fc2
         return self.Infer_OP

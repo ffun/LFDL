@@ -40,7 +40,7 @@ class BatchHelper(object):
         shuffle the m_items
         '''
         self.reset_cursor()
-        for i in xrange(times):
+        for _ in xrange(times):
             random.shuffle(self.index)
     def reset_cursor(self):
         '''

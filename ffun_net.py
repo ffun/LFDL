@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import tensorflow as tf
-from ffun.util import *
+from ffun import LayerHelper
 import ffun_data
+import math
 
 channels = ffun_data.img_cfg['channel']
 width = ffun_data.img_cfg['width']
@@ -42,16 +43,7 @@ def infer(images, keep_prob):
 
     #dropout
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
-
-    #w_fc2
-    '''
-    # fc2 if use regression
-    with tf.name_scope('fc2') as scope:
-        w_fc2 = LayerHelper.weight([1024, 1], name='weight')
-        b_fc2 = LayerHelper.bias([1], name='bias')
-    #output
-    inference = tf.matmul(h_fc1_drop, w_fc2) + b_fc2
-    '''
+    
     # fc2 use classify
     with tf.name_scope('fc2') as scope:
         w_fc2 = LayerHelper.weight([1024, 58], stddev=1.0/math.sqrt(1024), name='weight')
@@ -62,10 +54,6 @@ def infer(images, keep_prob):
 def loss(inference, labels):
     '''
     function:loss function use the inference and label to compute loss
-    '''
-    '''
-    #回归的损失函数
-    return tf.reduce_mean(tf.square(inference - labels), name='L2_Loss_mean')
     '''
     #分类的softmaxLoss,采用信息熵形式
     cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
@@ -78,7 +66,6 @@ def train(loss, lr):
     @loss:loss tensor from loss()\n
     @lr:The learning rate to use for gradient descent
     '''
-    # Create the gradient descent optimizer with the given learning rate.
     #optimizer = tf.train.GradientDescentOptimizer(lr)
     optimizer = tf.train.AdamOptimizer(lr, 0.9, 0.995)
     # Create a variable to track the global step
@@ -93,11 +80,6 @@ def eval(inference, labels):
     function to evaluation the DL model\n
     @inference:inference tensor from infer()\n
     @labels:labels tensor from ffun_data
-    '''
-    '''
-    diff = inference - labels
-    diff = tf.abs(diff)
-    return diff
     '''
     correct = tf.nn.in_top_k(inference, labels, 1)
     #correct = tf.equal(tf.argmax(inference, 1), tf.argmax(labels, 1))

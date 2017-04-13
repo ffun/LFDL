@@ -16,10 +16,6 @@ class Checker(object):
         if not BoolValue:
             sys.stderr.write(msg)
             assert BoolValue
-
-    '''
-    Class for check something
-    '''
     @classmethod
     def type_check(cls, obj, types, msg="Err"):
         '''
