@@ -53,7 +53,10 @@ class LayerHelper(object):
 
 class TfBuilder(NetHelper.NetBuilder):
     'Tensorflow Net builder'
-    def conv2d(self, x, w_shape, strides, padding, name, initializer_w=None, initializer_b=None):
+    def conv2d(self, x, w_shape, strides, padding, name,
+        initializer_w=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2),
+        initializer_b=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2)
+        ):
         '''
         convolution layer:
         Input
