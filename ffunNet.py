@@ -3,7 +3,6 @@
 import tensorflow as tf
 from ffun.NetHelper import*
 from ffun.LayerHelper import*
-import ffun_data
 
 class ffunNet(object):
     'ffun-net for LFDL'
@@ -112,23 +111,15 @@ class ffunNet(object):
         return self.Eval_OP
     def run_train(self, sess, dataset):
         'do train for Net'
-        feed_dict = ffun_data.fill_feed_dict(
-            #dataset.next_batch(), images_pl, labels_pl, prop_pl, mode='train'
-            dataset.next_batch(), self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL, mode='train'
-        )
-        _, loss = sess.run([self.train(), self.loss()], feed_dict=feed_dict)
+        _, loss = sess.run([self.train(), self.loss()], feed_dict=dataset.get_feeddict('test'))
         return loss
     def run_eval(self, sess, dataset):
         'do eval for Net'
         true_count = 0.0
         step_epochs = dataset.num() // dataset.batch_size()
         for step in xrange(step_epochs):
-            #get feed_dict
-            feed_dict = ffun_data.fill_feed_dict(
-                dataset.next_batch(), self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL, mode='test'
-            )
             #分类准确率计算
-            true_count += sess.run(self.eval(), feed_dict=feed_dict)
+            true_count += sess.run(self.eval(), feed_dict=dataset.get_feeddict('test'))
         #准确率
         precision = float(true_count)/dataset.num()
         eval_info = 'num_examples:%d,correct:%d,precision:%0.04f'

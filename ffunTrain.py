@@ -3,7 +3,7 @@
 import tensorflow as tf
 from ffunNet import ffunNet
 import CFG
-import data
+import ffunData
 import time
 import os.path
 from ffun.DataProvider import*
@@ -19,18 +19,17 @@ def run_train(max_steps):
     run train
     '''
     #get data:训练集，验证集合测试集
-    tr_bh, vf_bh, te_bh = data.data()
+    tr_bh, vf_bh, te_bh = ffunData.get_data_bh()
     #get batch_size
     bs = CFG.Batch_SIZE
-    #get DataSet
-    #train_bh, verify_bh, test_bh = DataSet(tr_bh, bs), DataSet(vf_bh, bs), DataSet(te_bh, bs)
-    train_bh = DataProvider(tr_bh, bs)
-    verify_bh, test_bh = DataProvider(vf_bh, bs), DataProvider(te_bh, bs)
+    #get DataSource
+    train_bh = ffunData.DataSource(tr_bh, bs)
+    verify_bh, test_bh = ffunData.DataProvider(vf_bh, bs), ffunData.DataProvider(te_bh, bs)
     net = ffunNet(CFG.LR)
     #graph
     with tf.Graph().as_default():
         #get placeholder
-        images_pl, labels_pl, prop_pl = data.placeholder_inputs(CFG.Batch_SIZE)
+        images_pl, labels_pl, prop_pl = train_bh.get_placeholder()
         #构建网络
         net.build(images_pl, labels_pl, prop_pl)
         train_op = net.train()#train_op一定要在初始化前在计算图中明确定义出，否则会出现未初始化错误
@@ -41,11 +40,8 @@ def run_train(max_steps):
             start_time = time.time()
             for i in xrange(max_steps):
                 for step in xrange(CFG.Iter_SIZE):
-                    #loss_value = net.run_train(sess, train_bh)
-                    feed_dict = data.fill_feed_dict(train_bh.next_batch(),\
-                    images_pl, labels_pl, prop_pl, mode='train')
+                    feed_dict = train_bh.get_feeddict('train')
                     # run train_op and loss op
-                    #_, loss_value = sess.run([train_op,net.loss()], feed_dict=feed_dict)
                     loss_value = net.run_train(sess, train_bh)
                     duration = time.time() - start_time
                     #print the message
@@ -61,7 +57,7 @@ def run_train(max_steps):
                     eval_info += 'Validation Data Eval:'
                     print eval_info
                     Logger.log(eval_info+'\n', CFG.Model_DIR+'/log.txt')
-                    eval_info = net.run_eval(sess, verify_bh)
+                    eval_info = net.run_eval(sess, verify_bh)#评估验证集
                     print eval_info
                     Logger.log(eval_info+'\n', CFG.Model_DIR+'/log.txt')
                     #test feed
@@ -69,7 +65,7 @@ def run_train(max_steps):
                     test_info += 'Test Data Eval:'
                     Logger.log(test_info+'\n', CFG.Model_DIR+'/log.txt')
                     print test_info
-                    test_info = net.run_eval(sess, test_bh)
+                    test_info = net.run_eval(sess, test_bh)#评估测试集
                     Logger.log(test_info+'\n', CFG.Model_DIR+'/log.txt')
                     print test_info
                     #keep model

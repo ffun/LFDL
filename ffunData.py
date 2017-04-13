@@ -61,7 +61,7 @@ def get_data():
     print 'generate data done!'
     return BatchHelper((epi_list, labels))
 
-def data():
+def get_data_bh():
     '''
     provide data
     '''
@@ -77,43 +77,6 @@ def data():
     test_bh = BatchHelper((images[num_vf:num_te], labels[num_vf:num_te]))
     return train_bh, verify_bh, test_bh
 
-def fill_feed_dict(data_set, images_pl, labels_pl, prob_pl, mode='train'):
-    '''
-    function to generate feed_dict\n
-    @data_set:The set of images and labels,from batch_data()
-    @images_pl: The images placeholder,from placeholder_inputs().
-    @labels_pl: The labels placeholder,from placeholder_inputs().
-    @prob_pl: The keep_prop placeholder,from placeholder_inputs().
-    '''
-    data = data_set
-    images_feed, labels_feed = data[0], data[1]
-    prop = 0.5
-    if mode == 'test':#if test phase
-        prop = 1.0
-    feed_dict = {
-      images_pl: images_feed,
-      labels_pl: labels_feed,
-      prob_pl: prop
-    }
-    return feed_dict
-
-
-def placeholder_inputs(batch_size):
-    '''
-    function to generate placeholder
-    Args:
-        batch_size: The batch size will be baked into both placeholders.
-    Returns:
-        images_pl: Images placeholder.
-        labels_pl: Labels placeholder.
-    '''
-    H, W, C = CFG.Input_H, CFG.Input_W, CFG.Input_C
-    images_pl = tf.placeholder(tf.float32, shape=(batch_size, H, W, C))
-    # 分类任务
-    labels_pl = tf.placeholder(tf.int32, shape=(batch_size))
-    keep_prob_pl = tf.placeholder('float')
-    return images_pl, labels_pl, keep_prob_pl
-
 class DataSource(DataProvider):
     'provide data、palceholder and feed_dict'
     def __init__(self, bh=None, batch_size=50, mode='once'):
@@ -125,14 +88,16 @@ class DataSource(DataProvider):
         self.IMAGES_PL = None
         self.KEEP_PROP_PL = None
         self.LABELS_PL = None
+        self.PL_OK = False
     def get_placeholder(self):
         '获得palceholder'
-        if self.IMAGES_PL and self.KEEP_PROP_PL and self.LABELS_PL:
+        if self.PL_OK:
             return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
         H, W, C = CFG.Input_H, CFG.Input_W, CFG.Input_C
         self.IMAGES_PL = tf.placeholder(tf.float32, shape=(self.batch_size(), H, W, C))
         self.LABELS_PL = tf.placeholder(tf.int32, shape=(self.batch_size()))
         self.KEEP_PROP_PL = tf.placeholder('float')
+        self.PL_OK = True
         return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
     def get_feeddict(self, mode='train'):
         '获得feeddict'
