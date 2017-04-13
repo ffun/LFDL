@@ -49,30 +49,16 @@ class ffunNet(object):
         self.LABELS_PL = labels_pl
         builder = self.builder
         # conv layer
-        conv1 = builder.conv2d(
-            images_pl,
-            [3, 3, 3, 64],
-            [1, 1, 1, 1],
-            'VALID',
-            name='conv1',
-            initializer_w=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2),
-            initializer_b=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2)
-        )
+        conv1 = builder.conv2d(images_pl, [3, 3, 3, 64], [1, 1, 1, 1], 'VALID', name='conv1')
         # pool layer
         pool1 = builder.max_pool(conv1, [1, 1, 2, 1], [1, 1, 2, 1], 'VALID', 'pool1')
         # conv layer
-        conv2 = builder.conv2d(
-            pool1, [3, 3, 64, 128], [1, 1, 1, 1], 'VALID', 'conv2',
-            initializer_w=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2),
-            initializer_b=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2)
-            )
+        conv2 = builder.conv2d(pool1, [3, 3, 64, 128], [1, 1, 1, 1], 'VALID', 'conv2')
         # pool layer
         pool2 = builder.max_pool(conv2, [1, 1, 2, 1], [1, 1, 2, 1], 'VALID', 'pool2')
         # fc layer
         flattened = tf.reshape(pool2, [-1, 5*6*128])
-        fc1 = builder.fc(
-            flattened, [5*6*128, 1024], 'fc1',
-        )
+        fc1 = builder.fc(flattened, [5*6*128, 1024], 'fc1')
         dropout1 = builder.dropout(fc1, keep_prop_pl)
         # fc layer. Disable relu for loss funtion
         fc2 = builder.fc(dropout1, [1024, 58], 'fc2', relu=False)
