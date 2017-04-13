@@ -1,9 +1,29 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import os,os.path
 
-import numpy as np
+class FileHelper(object):
+    '''
+    class to help deal with folder and File
+    '''
+    @staticmethod
+    def get_files(folder, suffix='.png'):
+        '''
+        function:to get all files in the current folder\n
+        return: tuple\n
+        @suffix:file's suffix
+        '''
+        files = []
+        filelist = os.listdir(folder)
+        for f in filelist:
+            if os.path.isfile(folder+'/'+f):
+                filename = folder+'/'+f#get filename
+                if filename.find(suffix) != -1:#filter the file
+                    files.append(filename)
+        files.sort()#对list的内容进行排序
+        return tuple(files)#返回tuple类型
 
-class TextLoader(object):
+class LabelHelper(object):
     '''
     Class to help loader file and get data
     '''

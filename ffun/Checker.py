@@ -8,18 +8,14 @@ class Checker(object):
     '''
     class for assert value
     '''
-    @classmethod
-    def failed_and_errout(cls, BoolValue, msg):
+    @staticmethod
+    def failed_and_errout(BoolValue, msg):
         '''
         check value and output when False
         '''
         if not BoolValue:
             sys.stderr.write(msg)
             assert BoolValue
-
-    '''
-    Class for check something
-    '''
     @classmethod
     def type_check(cls, obj, types, msg="Err"):
         '''

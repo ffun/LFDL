@@ -9,6 +9,8 @@ file:BatchHelper.py\n
 import random
 from Checker import Checker
 import sys
+from FileHelper import FileHelper,LabelHelper
+import Transer
 
 class BatchHelper(object):
     '''
@@ -35,12 +37,12 @@ class BatchHelper(object):
         for i in xrange(len(self.m_items)):
             Checker.seq_len_check(self.m_items[i], seq_length)
 
-    def shuffle(self,times=1):
+    def shuffle(self, times=1):
         '''
         shuffle the m_items
         '''
         self.reset_cursor()
-        for i in xrange(times):
+        for _ in xrange(times):
             random.shuffle(self.index)
     def reset_cursor(self):
         '''
@@ -129,30 +131,55 @@ class BatchHelper(object):
         return tuple(batch)
 
     def num(self):
+        '获得BH所持有的数据个数'
         return len(self.index)
+    def num_remain(self):
+        '获得BH剩余数据个数:由于BH支持循环读取，所以此值仅代表本轮的remain'
+        return self.end - self.front
 
-class DataSet(object):
-    '''
-    DataSet object\n
-    A Wrap of BatchHelper
-    '''
-    def __init__(self, bh, bz=50):
-        self.bh = bh
-        self.bz = bz
-    def num(self):
+class DataProvider(object):
+    'ffun package的数据组件'
+    def __init__(self, bh=None, batch_size=50, mode='once'):
         '''
-        funtion to get number of data elements
+        Input:
+        - mode:'once'数据内容一次加载至内存，'part':分步加载至内存
         '''
-        return self.bh.num()
-    def set_bz(self, bz):
+        self.BH = bh#所持有的BH，如果是once模式，BH持有数据和标签；否则BH持有数据路径和标签
+        self.BZ = (batch_size,)
+        self.MODE = (mode,)#使用元组形式存储MODE，防止被修改
+    def load_from_files(self, data_dir, suffix, label_path, transform):
         '''
-        function to set batch-size
+        加载文件路径和标签数据并封装成BH存储
         '''
-        self.bz = bz
-    def batch_size(self):
-        '''
-        funtion to get batch-size
-        '''
-        return self.bz
+        files = FileHelper.get_files(data_dir, suffix)
+        labels = LabelHelper.read(label_path, transform)
+        assert len(files) == len(labels)
+        self.BH = BatchHelper((files, labels))
+    def load_from_BH(self, bh):
+        '加载BH'
+        if not isinstance(bh, BatchHelper):
+            raise TypeError('bh should be BatchHelper OBJ')
+        self.BH = bh
     def next_batch(self):
-        return self.bh.next_batch(self.bz)
+        'get next batch data'
+        bz = self.BZ[0]
+        if self.MODE[0] == 'once':
+            return self.BH.next_batch(bz)
+        elif self.MODE[0] == 'part':
+            '''
+            1.在分布加载模型中，是读取self.BH中存储的文件路径的文件，然后组成新的BH并获取next_batch
+            2.默认在part模式，每次加载batch-size个数据，为了加速，其实一次性可以加载bs的n倍数据.
+            但是此时这种情况下，需要让该类持有一个额外的bh临时保存，每次先检查它的num_remain()值，如果为0了，
+            再加载一次。同时要考虑好n的大小，让n*bs不大于BH.num()
+            '''
+            paths, labels = self.BH.next_batch(bz)
+            data = []
+            for path in paths:
+                data.append(Transer.image2ndarray(path))
+            return BatchHelper((data, labels)).next_batch(bz)
+    def num(self):
+        '获得所持有的数据个数总数'
+        return self.BH.num()
+    def batch_size(self):
+        '获取batch-size的值'
+        return self.BZ[0]

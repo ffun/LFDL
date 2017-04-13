@@ -34,12 +34,15 @@ class Layer(object):
         '获得填补数量'
         return self.padding
     def __str__(self):
-        '得到吱声的'
+        '得到自身的toString()'
         info = self.name+',shape:'+str(self.shape)
         return info
     def out_shape(self, in_shape):
-        '根据上一层的输出shape得到当前层输出的shape'
-        pass
+        '''
+        根据上一层的输出shape得到当前层输出的shape\n
+        Layer默认输出self.shape,子类除了Data_Layer以外,其余的都要重写此方法
+        '''
+        return self.shape
 class Conv_Layer(Layer):
     '卷积层'
     def __init__(self, shape, strides=[1, 1, 1, 1], padding=None, name=None):
@@ -88,6 +91,8 @@ class Pool_Layer(Layer):
         H = (Kh0 - Kh1)//Sh + 1
         W = (Kw0 - Kw1)//Sw + 1
         return [H, W, C0]
+    def get_style(self):
+        return self.style
 class Fc_Layer(Layer):
     '''
     全连接层，层维度只有2维，指明输入和输出的神经元个数即可\n
@@ -122,6 +127,7 @@ class Net(object):
         self.name = 'Net'
         if 'name' in param:
             self.name = param['name']
+        #添加层，推荐以这种方式
         for layer in layers:
             self.add_layer(layer)
     def add_layer(self, layer):
@@ -143,7 +149,10 @@ class Net(object):
         return self
     def layer_num(self):
         '层数'
-        return self.__len - 1
+        if self.__len > 1:
+            return self.__len - 1
+        else:
+            return 0
     def layers(self):
         '返回Net所持有的Layer的副本'
         return self.__layers[:]
@@ -160,7 +169,8 @@ class Net(object):
         '计算权重消耗的参数'
         cost = 0
         for layer in self.__layers:
-            if isinstance(layer, Conv_Layer) or isinstance(layer, Fc_Layer):
+            #检查layer是否具有memory_cost接口
+            if hasattr(layer, 'memory_cost'):
                 cost += layer.memory_cost()
         return cost*batch_size
     def hidden_memory_cost(self, batch_size=1):
@@ -180,3 +190,29 @@ class Net(object):
         '计算Net所消耗的参数数量'
         cost = self.weight_memery_cost() + self.hidden_memory_cost() +self.data_memory_cost()
         return cost*batch_size
+
+class NetBuilder(object):
+    'for build Net'
+    def __init__(self):
+        self.NET = None
+        pass
+    def load_net(self, net):
+        'Load '
+        assert isinstance(net, Net)
+        assert net.layer_num != 0
+        self.NET = net
+    def create(self):
+        'creat net'
+        pass
+    def conv2d(self, x, w_shape, strides, padding, name, initializer_w=None, initializer_b=None):
+        'convolution layer'
+        pass
+    def max_pool(self, x, ksize, strides, padding, name):
+        'max pooling layer'
+        pass
+    def fc(self, x, w_shape, name, relu=True, initializer_w=None, initializer_b=None):
+        'fully connected layer'
+        pass
+    def dropout(self, x, keep_prop):
+        'keep_prpo layer'
+        pass
