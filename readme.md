@@ -2,10 +2,11 @@
 光场阵列相机深度学习.
 
 ## Requirements  
-- Tensorflow1.0  
+- [TensorFlow1.0][TensorFlow]  
 - Python2.7  
 - Numpy  
 - PIL(for data generation in EPI EPIcreator)
+- [**lightfield-analysis/python-tools**][Python Tool](数据集官方提供的工具)
 
 ## ffun  
 依赖于PIL,numpy,tensorflow等而写的一个python package。  
@@ -26,7 +27,7 @@
 ```bash
 git clone https://github.com/ffun/LFDL.git
 ```  
-2. 下载box数据集、解压，修改配置文件  
+2. 下载光场数据集、解压  
 打开`CFG.py`文件，可以看到如下的配置文件:
 
 ```python
@@ -59,7 +60,9 @@ Epoch_SIZE = 50#一次epoch=所有训练数据forward+backward后更新参数的
 
 - 请修改`Image_DIR`的值为box解压的绝对路径，然后运行`python ffunData.py --epi`产生原始epi文件。接着，把原始epi文件所在目录的绝对路径填入`EPI_DIR`的值  
 
-- 修改`Model_DIR`的值，它表示训练好的模型要存放在哪个地方。你还可以修改迭代的次数，学习率等等。  
+- 修改`Model_DIR`的值，它表示训练好的模型要存放在哪个地方。你还可以修改迭代的次数，学习率等等.  
+
+- 生成disp.txt文件(可选)。如有需要，复制`generate_disp.py`脚本到`/python-tool`目录下，修改其中的训练数据目录、disp存放目录2个参数，然后执行`python generate_disp.py`
 
 3. 一切就绪  
 运行`python ffunTrain.py`开始训练网络。大致会显示如下信息：
@@ -92,7 +95,8 @@ Step 300: loss = 1.11 (32.315 sec)
 
 7. 本代码基础框架还有许多要修改的地方，比如集成模型加载、可视化、增强NetHelper的能力等。我将在后续继续完善。本代码还有比较简陋的r0.1版本，请查看其分支。
 
-
+[TensorFlow]:https://github.com/tensorflow/tensorflow
 [caffe-link]:http://caffe.berkeleyvision.org/
 [Blog]:http://kratzert.github.io/2017/02/24/finetuning-alexnet-with-tensorflow.html?utm_source=tuicool&utm_medium=referral
 [CODE]:https://github.com/kratzert/finetune_alexnet_with_tensorflow
+[Python Tool]:https://github.com/lightfield-analysis/python-tools.git
