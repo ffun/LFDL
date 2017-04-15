@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import time
+import os.path
 import tensorflow as tf
 from ffunNet import ffunNet
 import CFG
 import ffunData
-import time
-import os.path
-from ffun.DataProvider import*
 
 class Logger(object):
     @staticmethod
@@ -35,9 +34,12 @@ def run_train(max_steps):
         train_op = net.train()#train_op一定要在初始化前在计算图中明确定义出，否则会出现未初始化错误
         #saver
         saver = tf.train.Saver()
+        merged_summary_op = tf.summary.merge_all()
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())# init variables
+            summary_writer = tf.summary.FileWriter(CFG.TB_Log_DIR, sess.graph)#Tensorboard
             start_time = time.time()
+            cnt = 0
             for i in xrange(max_steps):
                 for step in xrange(CFG.Iter_SIZE):
                     feed_dict = train_bh.get_feeddict('train')
@@ -45,13 +47,15 @@ def run_train(max_steps):
                     loss_value = net.run_train(sess, train_bh)
                     duration = time.time() - start_time
                     #print the message
-                    if step % 500 == 0:
+                    if cnt % 500 == 0:
                         tran_info = 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
                         print tran_info
                         Logger.log(tran_info+'\n', CFG.Model_DIR+'/log.txt')#logging
-                        
+                        summary_str = sess.run(merged_summary_op)
+                        summary_writer.add_summary(merged_summary_op)
+                    cnt += 1
                     #Save a checkpoint and evaluate the model periodically.
-                if (i+1) % 10 == 0 or (i+1) == max_steps:#每10w次评估下
+                if (cnt+1) % 10 == 0 or (cnt+1) == max_steps:#每10w次评估下
                     #eval
                     eval_info = 'Step '+str(i)+':'
                     eval_info += 'Validation Data Eval:'

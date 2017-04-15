@@ -31,3 +31,6 @@ LR = 1e-4 # 学习率
 Batch_SIZE = 50 #batch-size
 Iter_SIZE = (Data_TRAIN_NUM//Batch_SIZE)#[batch-size]个训练数据forward+backward后更新参数过程
 Epoch_SIZE = 50#一次epoch=所有训练数据forward+backward后更新参数的过程
+
+#TF param
+TB_Log_DIR = (Model_DIR+'/tb_log')#TensorBoard

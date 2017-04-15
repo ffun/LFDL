@@ -6,15 +6,12 @@ from ffun.LayerHelper import*
 
 class ffunNet(object):
     'ffun-net for LFDL'
-    def __init__(self, lr, skip_layer=None, weights_path=None):
+    def __init__(self, lr):
         '''
         Inputs:
-        - skip_layer: list of strings, names of the layers you want to reinitialize
-        - weights_path: path string, path to the pretrained weights
+        - lr:learning rate
         '''
         # Net param
-        self.SKIP_LAYER = skip_layer
-        self.WEIGHTS_PATH = weights_path
         self.LR = lr
         self.IMAGES_PL = None
         self.KEEP_PROP_PL = None
@@ -111,6 +108,6 @@ class ffunNet(object):
         eval_info = 'num_examples:%d,correct:%d,precision:%0.04f'
         eval_info = eval_info % (dataset.num(), true_count, precision)
         return eval_info
-    def load_weights(self):
+    def load_weights(self, sess, path):
         'load pretrained model'
         pass
