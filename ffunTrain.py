@@ -24,7 +24,7 @@ def run_train(max_steps):
     #get DataSource
     train_bh = ffunData.DataSource(tr_bh, bs)
     verify_bh, test_bh = ffunData.DataProvider(vf_bh, bs), ffunData.DataProvider(te_bh, bs)
-    net = ffunNet(CFG.LR)
+    net = ffunNet(CFG.LR, CFG.Class_NUM)
     #graph
     with tf.Graph().as_default():
         #get placeholder
@@ -51,8 +51,8 @@ def run_train(max_steps):
                         tran_info = 'Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration)
                         print tran_info
                         Logger.log(tran_info+'\n', CFG.Model_DIR+'/log.txt')#logging
-                        summary_str = sess.run(merged_summary_op)
-                        summary_writer.add_summary(merged_summary_op)
+                        #summary_str = sess.run(merged_summary_op)
+                        #summary_writer.add_summary(merged_summary_op)
                     cnt += 1
                     #Save a checkpoint and evaluate the model periodically.
                 if (cnt+1) % 10 == 0 or (cnt+1) == max_steps:#每10w次评估下

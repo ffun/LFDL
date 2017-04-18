@@ -20,7 +20,7 @@ def epi_patch_generate():
     '生成用于训练的epi patch'
     pass
 
-def label_trans(x, class_num=58):
+def label_trans(x, class_num=CFG.Class_NUM):
     '标签转换函数:把float转换成int，[0,57]'
     r = (x+2)*class_num/4
     r = int(round(r))#四舍五入后取整
@@ -29,6 +29,11 @@ def label_trans(x, class_num=58):
     elif r < 0:
         r = 0
     return r
+
+def class_trains(y, class_num = CFG.Class_NUM):
+    '类别转换函数：把infer得到的class转换成float以便与label比较'
+    x = y*4.0/class_num - 2
+    return x
 
 #batch-data
 def get_data():
@@ -105,6 +110,31 @@ class DataSource(DataProvider):
         prop = 0.5
         if mode == 'test':
             prop = 1.0
+        images_feed, labels_feed = self.next_batch()#获得数据
+        feed_dict = {
+            self.IMAGES_PL: images_feed,
+            self.LABELS_PL: labels_feed,
+            self.KEEP_PROP_PL: prop
+        }
+        return feed_dict
+
+class TestData(DataSource):
+    '测试数据集提供者'
+    def get_placeholder(self):
+        '获得palceholder'
+        if self.PL_OK:
+            return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
+        H, W, C = CFG.Input_H, CFG.Input_W, CFG.Input_C
+        self.IMAGES_PL = tf.placeholder(tf.float32, shape=(self.batch_size(), H, W, C))
+        #原始数据集，采用tf.float32作为占位符
+        self.LABELS_PL = tf.placeholder(tf.float32, shape=(self.batch_size()))
+        self.KEEP_PROP_PL = tf.placeholder('float')
+        self.PL_OK = True
+        return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
+    def get_feeddict(self):
+        '获得feeddict'
+        self.get_placeholder()
+        prop = 1.0
         images_feed, labels_feed = self.next_batch()#获得数据
         feed_dict = {
             self.IMAGES_PL: images_feed,

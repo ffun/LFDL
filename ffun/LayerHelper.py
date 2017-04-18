@@ -53,7 +53,7 @@ class LayerHelper(object):
 
 class TfBuilder(NetHelper.NetBuilder):
     'Tensorflow Net builder'
-    def conv2d(self, x, w_shape, strides, padding, name,
+    def conv2d(self, x, w_shape, strides, padding, name, reuse=False,
         initializer_w=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2),
         initializer_b=tf.truncated_normal_initializer(mean=0.0, stddev=1e-2)
         ):
@@ -68,7 +68,7 @@ class TfBuilder(NetHelper.NetBuilder):
         - initializer_w/b:initializer of weight and bias
         '''
         _, _, _, num_out = w_shape
-        with tf.variable_scope(name) as scope:
+        with tf.variable_scope(name, reuse=reuse) as scope:
             weights = tf.get_variable('weights', w_shape, initializer=initializer_w)
             biases = tf.get_variable('biases', [num_out], initializer=initializer_b)
         #conv
@@ -79,10 +79,10 @@ class TfBuilder(NetHelper.NetBuilder):
     def max_pool(self, x, ksize, strides, padding, name=None):
         'max pooling layer'
         return tf.nn.max_pool(x, ksize, strides, padding)
-    def fc(self, x, w_shape, name, relu=True, initializer_w=None, initializer_b=None):
+    def fc(self, x, w_shape, name, relu=True, reuse=False, initializer_w=None, initializer_b=None):
         'fully connected layer'
         _, num_out = w_shape
-        with tf.variable_scope(name) as scope:
+        with tf.variable_scope(name, reuse=reuse) as scope:
             weights = tf.get_variable('weights', w_shape, initializer=initializer_w)
             biases = tf.get_variable('biases', [num_out], initializer=initializer_b)
         act = tf.nn.xw_plus_b(x, weights, biases, name=scope.name)

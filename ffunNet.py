@@ -2,16 +2,18 @@
 # -*- coding: UTF-8 -*-
 import tensorflow as tf
 from ffun.NetHelper import*
-from ffun.LayerHelper import*
+from ffun.LayerHelper import TfBuilder
+import ffunData
 
 class ffunNet(object):
     'ffun-net for LFDL'
-    def __init__(self, lr):
+    def __init__(self, lr, ClassNum):
         '''
         Inputs:
         - lr:learning rate
         '''
         # Net param
+        self.Class_NUM = ClassNum
         self.LR = lr
         self.IMAGES_PL = None
         self.KEEP_PROP_PL = None
@@ -58,7 +60,7 @@ class ffunNet(object):
         fc1 = builder.fc(flattened, [5*6*128, 1024], 'fc1')
         dropout1 = builder.dropout(fc1, keep_prop_pl)
         # fc layer. Disable relu for loss funtion
-        fc2 = builder.fc(dropout1, [1024, 58], 'fc2', relu=False)
+        fc2 = builder.fc(dropout1, [1024, self.Class_NUM], 'fc2', relu=False)
         #assign the fc2 to scode
         self.Infer_OP = fc2
         return self.Infer_OP
@@ -84,7 +86,7 @@ class ffunNet(object):
         self.Train_OP = train_op
         return self.Train_OP
     def eval(self):
-        'get Eval op'
+        'get Eval op:针对分类正确进行统计'
         self.__check()
         if self.Eval_OP is not None:
             return self.Eval_OP
@@ -108,6 +110,15 @@ class ffunNet(object):
         eval_info = 'num_examples:%d,correct:%d,precision:%0.04f'
         eval_info = eval_info % (dataset.num(), true_count, precision)
         return eval_info
+    def run_eval_origin_label(self, sess, dataset, ):
+        '针对原始标签进行准确度计算'
+        self.__check()
+        step_epochs = dataset.num() // dataset.batch_size()
+        for step in xrange(step_epochs):
+            feed_dict = dataset.get_feeddict('test')
+            #得到infer输出
+            out = sess.run(self.Infer_OP, feed_dict=feed_dict)
+        pass
     def load_weights(self, sess, path):
         'load pretrained model'
         pass
