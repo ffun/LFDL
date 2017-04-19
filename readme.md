@@ -6,6 +6,7 @@
 - Python2.7  
 - Numpy  
 - PIL(for data generation in EPI EPIcreator)
+- opencv
 - [**lightfield-analysis/python-tools**][Python Tool](数据集官方提供的工具)
 
 ## ffun  

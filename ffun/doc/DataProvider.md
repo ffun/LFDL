@@ -1,5 +1,5 @@
-# ffun.DataDataProvider  
-此模块主要负责数据提供
+# ffun.DataProvider  
+此模块主要负责数据提供  
 - 导入package  
 ```python
 from ffun.DataProvider import*

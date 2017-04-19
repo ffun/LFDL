@@ -9,10 +9,10 @@ from ffun import LabelHelper
 import numpy as np
 import tensorflow as tf
 
-def epi_generate():
+def epi_generate(ImgPath):
     '生成单个样本的原始epi文件'
     print 'gengerating EPI Files'
-    files = FileHelper.get_files(CFG.Image_DIR)
+    files = FileHelper.get_files(ImgPath)
     epi_creator = EPIcreator(files)
     epi_creator.create((36, 44))
 
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     opts, _ = getopt.getopt(sys.argv[1:], "h", ['epi'])
     for op, value in opts:
         if op == '--epi':
-            epi_generate()
+            epi_generate(CFG.Image_DIR)
         elif op == '-h':
             usage()
     if len(opts) == 0:
