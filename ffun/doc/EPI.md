@@ -17,7 +17,7 @@ epi = EPI(files)
 #生成EPI文件，入参分别是图片索引序列(可以是任意的索引序列)、epi方向(u--水平，v--竖直方向)、存放路径
 epi.create(range(36, 45), 'u','/Users/fang/workspaces/tf_space/test/EPI-u')
 ```  
-上述代码会在`EPI-u`目录下产生`epi45_53`目录，并在目录下产生000~511.png（假设原始图像height = 512)。EPI在creat()的时候，会根据水平或竖直方向、以及图片的长宽，自动计算EPI的尺寸和通道数。  
+上述代码会在`EPI-u`目录下产生000~511.png（假设原始图像height = 512)。EPI对象在creat()的时候，会根据水平或竖直方向、以及图片的长宽，自动计算EPI的尺寸和通道数。  
 
 ## PatchHelper  
 Patch提取助手
