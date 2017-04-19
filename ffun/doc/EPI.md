@@ -1,21 +1,21 @@
-# ffun.io package  
+# ffun.EPI package  
 此包主要处理一些io相关的操作
 - 导入package  
 ```python
 from ffun.EPI import*
 from ffun.FileHelper import*
 ```  
-## EPI Genration  
+## EPI
 ```python
-#得到文件列表，入参为文件目录。
-#返回的文件列表是经过排序的(排序规则为字典序)
-files =  FileHelper.get_files('/Users/fang/workspaces/tf_space/LFDL/pngdata')
+示例:
+#得到文件列表，入参为文件目录，文件后缀。返回经过排序的文件名
+files =  FileHelper.get_files('/Users/fang/workspaces/tf_space/box', '.png')
 #创建EPI生成器对象，入参为文件列表的元组
-Epi_creator = EPIcreator(files)
-#生成EPI文件，入参为图片索引闭区间
-Epi_creator.create((45,53))
+epi = EPI(files)
+#生成EPI文件，入参分别是图片索引序列(可以是任意的索引序列)、epi方向(u--水平，v--竖直方向)
+epi.create(range(36, 45), 'u','/Users/fang/workspaces/tf_space/test/EPI-u')
 ```  
-上述代码会在`pngdata`目录下产生`epi45_53`目录，并在目录下产生epi45_53_000~511.png（假设原始图像height = 512）。生成的epi数据是原始epi，实际训练可能只是其中的一个窗口数据，此时需要调用`EPIextractor`提供的方法。  
+上述代码会在`EPI-u`目录下产生`epi45_53`目录，并在目录下产生000~511.png（假设原始图像height = 512)。EPI在creat()的时候，会根据水平或竖直方向、以及图片的长宽，自动计算EPI的尺寸和通道数。  
 
 ## EPI extract  
 ```python

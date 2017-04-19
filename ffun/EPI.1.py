@@ -4,8 +4,9 @@
 from PIL import Image
 import os,os.path
 import numpy as np
+from DataUtil import ImageHelper
 
-class EPIcreator(object):
+class EPI(object):
     '''
     class to create origin epi file
     '''
@@ -13,48 +14,63 @@ class EPIcreator(object):
         self.files = files
         self.file_num = len(self.files)
 
-    def create(self, block, folder=None):
+    def create(self, indexs, axis='u', folder=None):
         '''
-        function to create origin epi file\n
-        @block:图像索引闭区间\n
-        @folder:to place the epi files generated\n
-        default is the folder of origin images in files
+        function to create epi file\n
+        Input:
+        - indexs:图像的索引序列
+        - axis:'u'--水平方向，'v'--竖直方向
+        - folder:to place the epi files generated
         '''
-        if not isinstance(block, tuple):
-            raise TypeError("block should be tuple-type")
-        if len(block) != 2 and block[0]<block[1]:
-            raise ValueError("len(block) should be 2")
-        start, end = block[0], block[1]
+        # check
+        assert axis=='u' or axis == 'v'
+        assert isinstance(indexs, tuple) or isinstance(indexs, list)
+        assert len(indexs) > 0
         #get the folder if param is None
-        if folder is None:
+        epi_folder = folder
+        if epi_folder is None:
             filename = self.files[0]
-            #folder = filename[:filename.rfind('/')]
-            folder = os.path.split(filename)[0]#get the folder
-        epi_folder = folder+'/epi'+str(start)+'_'+str(end)+'/'
-        #judge the folder exist
+            epi_folder = os.path.split(filename)[0]
+            epi_folder += '/EPI_' + axis + '_' + str(indexs[0])+'_'+str(indexs[-1])
+        # 检测是否存在目录，不存在则创建一个
         if not os.path.exists(epi_folder):
-            os.mkdir(epi_folder)# creat a folder for EPI
-        #some prefix & suffix of file
-        epi_file_prefix = 'epi_'+str(start)+'_'+str(end)+'_'
+            os.mkdir(epi_folder)
+        #读取图像
+        images = []
+        for index in indexs:
+            f = self.files[index]
+            images.append(ImageHelper().read(f))
+        # 获取原图像信息
+        height, width = images[0].size_H_W()
+        channels = images[0].channels()
+        # 构建shape
+        shape = (len(indexs), width, channels)
+        line_num = height
+        if axis == 'v':
+            shape = (height, len(indexs), channels)
+            line_num = width
+        # png文件后缀
         png_suffix = '.png'
-        images = self.files
-        #get width and height of the image
-        width, height = 0, 0
-        with open(images[start], 'r') as f:
-            im = Image.open(f)
-            width, height = im.size
-        #generate origin epi
-        for h in xrange(0, height):
-            epi_image = Image.new('RGB', (width, end-start+1), (255, 255, 255))
-            for j in xrange(start, end+1):
-                with open(images[j], 'r') as f:
-                    im = Image.open(f)
-                    for w in xrange(0, width):
-                        pixel = im.getpixel((w, h))#get the pixel
-                        epi_image.putpixel((w, j-start), pixel)#put the pixel into epi_image
-            #保存epi图像，图像名称后缀,为截取的区间和高度，其中高度使用3位数对齐
-            epi_image.save(epi_folder+epi_file_prefix+'{:0>3}'.format(h)+png_suffix)
-            print 'epi'+'{:0>3}'.format(h)+' generate'
+        # 构建EPI
+        for line_index in xrange(line_num):
+            epi = np.ndarray(shape)
+            cnt = 0
+            for image in images:
+                #获得numpy.ndarray类型的data
+                data = image.data_convert3d()
+                line = None
+                if axis == 'u':#水平方向上
+                    line = data[line_index, :, :]
+                    epi[cnt, :, :] = line
+                elif axis == 'v':#竖直方向上
+                    line = data[:, line_index, :]
+                    epi[:, cnt, :] = line
+                cnt += 1#cnt自增
+            # 保存epi
+            filename = '{:0>3}'.format(line_index) + png_suffix
+            filename = epi_folder + '/' + filename
+            img = Image.fromarray(np.uint8(epi))
+            img.save(filename)
         print 'done!'
 
 
@@ -136,4 +152,4 @@ class EPIextractor(object):
         #new image & change the data into uint8
         epi_img = Image.fromarray(np.uint8(epi))
         epi_img.save(epi_fn)
-        
+

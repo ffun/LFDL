@@ -2,10 +2,11 @@
 此模块主要负责数据预处理  
 - 导入package  
 ```python
-from ffun.DataProvider import*
+from ffun.DataUtil import*
 ```  
 
-## ImageHelper
+## ImageHelper  
+图像的包装类，提供读取、存储、获取图像信息等功能
 
 ```python
 #新建ImageHelper对象
@@ -37,5 +38,5 @@ ihn = ImageHelper().read(xxx)
 #创建ImageCollection并添加ih(或者通过ImageCollection.add_image()添加)
 ic = ImageCollection(ih1, ih2,···，ihn)
 #得到集合内所有图像按channel叠加的数据
-data = ic.reduce_with_channel()
+data = ic.contact_with_channel()
 ```

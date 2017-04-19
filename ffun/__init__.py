@@ -5,3 +5,4 @@ from SeqHelper import*
 from Transer import *
 from DataProvider import *
 from FileHelper import*
+from DataUtil import*

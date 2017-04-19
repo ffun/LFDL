@@ -81,13 +81,12 @@ class ImageCollection(object):
         self.IMAGE.append(image)
         self.CHANNEL += image.channels()
         return self
-    def reduce_with_channel(self):
+    def contact_with_channel(self):
         '所持有的image通过channel叠成一个ndarray'
         assert self.size() != 0
         #生成需要的shape
         shape = list(self.SIZE_H_W)
         shape.append(self.CHANNEL)
-        print shape
         #根据shape生成需要的ndarray
         data = np.ndarray(shape)
         #循环赋值,得到叠在一起的ndarray
