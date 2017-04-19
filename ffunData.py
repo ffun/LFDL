@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 import sys,getopt
 import CFG
-from ffun.EPI import*
+from ffun.EPI import EPI,PatchHelper
 from ffun.DataProvider import DataProvider,BatchHelper
 from ffun.FileHelper import*
 from ffun import LabelHelper
@@ -13,8 +13,8 @@ def epi_generate(ImgPath):
     '生成单个样本的原始epi文件'
     print 'gengerating EPI Files'
     files = FileHelper.get_files(ImgPath)
-    epi_creator = EPIcreator(files)
-    epi_creator.create((36, 44))
+    epi = EPI(files)
+    epi.create(range(36, 45), 'u')
 
 def epi_patch_generate():
     '生成用于训练的epi patch'

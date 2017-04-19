@@ -12,10 +12,10 @@
 ## ffun  
 依赖于PIL,numpy,tensorflow等而写的一个python package。  
 相关组件(持续更新中)：  
-- EPIcreator  
+- EPI
 根据数据样本产生原始EPI文件  
-- EPIextractor  
-输入原始EPI文件，提取用于训练特定大小的EPI文件  
+- PatchHelper
+输入图像文件，提取用于训练特定大小的patch文件  
 - BatchHelper  
 支持乱序、next_batch()方法支持循环取数据  
 - NetHelper  
