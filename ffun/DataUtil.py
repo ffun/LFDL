@@ -24,8 +24,6 @@ class ImageHelper(object):
         return self
     def channels(self):
         'get num of channels of the image'
-        if self.__channels != 0:
-            return self.__channels
         #计算channels
         shape = self.shape()
         channel = 1
@@ -52,6 +50,9 @@ class ImageHelper(object):
         return self.__data
     def save(self, path):
         '保存图像'
+        # check，防止出现灰度图，而且被convert3d后的数据保存，否则会出错
+        if len(self.shape()) == 3:
+            assert self.channels() == 3
         img = Image.fromarray(np.uint8(self.data()))
         img.save(path)
     def shape(self):

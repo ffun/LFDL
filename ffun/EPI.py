@@ -80,6 +80,7 @@ class PatchHelper(object):
         self.__image = ImageHelper(image)
         self.__patches = []
     def padding(self, pad):
+        '补0填充，pad是一个四维向量，分别表示上下左右的pad数量'
         # check
         assert isinstance(pad, tuple) or isinstance(pad, list)
         assert len(pad) == 4
@@ -88,36 +89,44 @@ class PatchHelper(object):
         c = image.channels()
         up, down, left, right = pad#得到上下左右的padding数量
         shape = (h + up + down, w + left + right, c)
-        data = np.full(shape, 0)#定义shape的ndarray，并用0填充
+        data = np.zeros(shape)#定义shape的ndarray，并用0填充
         #批量赋值
         data[up:up + h, left:left + w, :] = image.data_convert3d()
         #持有数据
         self.__image = ImageHelper(data)
     def extract(self, ksize, stride):
+        '''
+        提取函数：ksize--卷积核尺寸，也就是要提取的patch大小，stride步长\n
+        Inputs:
+        - ksize:[H,W]
+        - stride:[H,W]
+        '''
         # check
         assert isinstance(ksize, tuple) or isinstance(ksize, list)
         assert isinstance(stride, tuple) or isinstance(stride, list)
         assert len(ksize) == 2 and len(stride) == 2
         # get image info
         height, width = self.__image.size_H_W()
-        start = [0, 0]
+        kh, kw = ksize
+        sh, sw = stride
+        start = [0, 0]#初始化卷积左上角坐标
         while start[0] < height:
-            #得到卷积下边点H坐标
-            end_h = start[0] + ksize[0]
+            #得到卷积左下角H坐标
+            end_h = start[0] + kh
             #如果超过图像高度退出循环
             if end_h > height:
                 break
-            start[1] = 0#初始化卷积左上角坐标
+            start[1] = 0#初始化卷积左上角W坐标
             while start[1] < width:
-                #得到卷积下边点w坐标
-                end_w = start[1] + ksize[1]
+                #得到卷积右上角W坐标
+                end_w = start[1] + kw
                 if end_w <= width:
                     patch = self.__image.data_convert3d()[start[0]:end_h, start[1]:end_w, :]
                     self.__patches.append(patch)
-                    start[1] += stride[1]#卷积左上角w坐标加上步长w
-                if end_w > width:
+                    start[1] += sw#卷积左上角w坐标右移步长w
+                else:
                     break
-            start[0] += stride[0]#卷积左上角h坐标加上步长h
+            start[0] += sh#卷积左上角h坐标下移步长h
         return self
     def patches(self):
         '得到patch'

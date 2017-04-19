@@ -5,14 +5,14 @@ import CFG
 from ffun.EPI import EPI,PatchHelper
 from ffun.DataProvider import DataProvider,BatchHelper
 from ffun.FileHelper import*
-from ffun import LabelHelper
+from ffun.DataUtil import ImageHelper
 import numpy as np
 import tensorflow as tf
 
 def epi_generate(ImgPath):
     '生成单个样本的原始epi文件'
     print 'gengerating EPI Files'
-    files = FileHelper.get_files(ImgPath)
+    files = FileHelper.get_files(ImgPath, '.png')
     epi = EPI(files)
     epi.create(range(36, 45), 'u')
 
@@ -50,17 +50,14 @@ def get_data():
     print 'load labels done!'
     labels = np.array(labels)#转为numpy.ndarray类型数据
     #得到排序后的图片文件列表
-    #origin_epi_list = Fio.FileHelper.get_files(tdc['origin-epi-dir'])
-    origin_epi_list = FileHelper.get_files(CFG.EPI_DIR)
+    images = FileHelper.get_files(CFG.EPI_DIR)
     epi_list = []
-    for i in xrange(len(origin_epi_list)):
-        Extractor = EPIextractor(origin_epi_list[i])
-        #给原图像加上padding,这样下面我们就可以提取长度为33的
-        Extractor.set_padding(CFG.Input_W)
-        #for j in xrange(img_cfg['width']):
-        for j in xrange(CFG.EPI_W):
-            epi = Extractor.extract(j, CFG.Input_W)
-            epi_list.append(epi)
+    for image in images:
+        ph = PatchHelper(ImageHelper().read(image).data_convert3d())
+        ph.padding([0, 0, 16, 16])
+        ph.extract([9, 33], [1, 1])
+        epi_list.extend(ph.patches())
+    print len(epi_list)
     print 'generate epi done!'
     assert len(labels) == len(epi_list)#check
     print 'generate data done!'
