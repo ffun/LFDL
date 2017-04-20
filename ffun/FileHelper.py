@@ -40,33 +40,27 @@ class FileHelper(object):
         return folders
 
 class LabelHelper(object):
-    '''
-    Class to help loader file and get data
-    '''
+    'Class for helping to load file and get data'
     def __init__(self, separator=" "):
         '''
-        @separator:the separator of element in one line,\n
-        Default is space
+        Inputs:
+        - separator:一行中元素的分隔符，默认空格
         '''
         self.separator = separator
 
-    def read(self, filepath, transform=None):
+    def read(self, path, transform=None):
         '''
-        Function to get a list of data\n
-        @filepath:the path of the file\n
-        @transform:transform the single data,default:float\n
-        Example:\n
-        1:line in file "1 2\\r\\n"\n
-        result:[1,2]\n
-        2:line in file "1 2\\r\\n3 4\\r\\n"\n
-        result:[[1,2],[3,4]]
+        读取标签文件，对每个元素进行转换，返回一个list\n
+        Inputs:
+        - path:标签文件的路径
+        - transform:转换函数
         '''
-        with open(filepath, "rb") as f:
+        with open(path, "rb") as f:
             d = []
             for line in f.readlines():
                 line = line.strip()#过滤掉换行符
                 data = line.split(self.separator)
-                #if transform Function is not None,do transform
-                for i in xrange(len(data)):
-                    d.append(transform(data[i]))
+                if transform is not None:
+                    data = map(transform, data)
+                d.extend(data)
         return d

@@ -13,8 +13,9 @@ class EPI(object):
     def __init__(self, files):
         self.files = files
         self.file_num = len(self.files)
+        self.EPIs = []
 
-    def create(self, indexs, axis='u', folder=None):
+    def create(self, indexs, axis='u'):
         '''
         function to create epi file\n
         Input:
@@ -26,15 +27,6 @@ class EPI(object):
         assert axis=='u' or axis == 'v'
         assert isinstance(indexs, tuple) or isinstance(indexs, list)
         assert len(indexs) > 0
-        #get the folder if param is None
-        epi_folder = folder
-        if epi_folder is None:
-            filename = self.files[0]
-            epi_folder = os.path.split(filename)[0]
-            epi_folder += '/EPI_' + axis + '_' + str(indexs[0])+'_'+str(indexs[-1])
-        # 检测是否存在目录，不存在则创建一个
-        if not os.path.exists(epi_folder):
-            os.mkdir(epi_folder)
         #读取图像
         images = []
         for index in indexs:
@@ -49,15 +41,13 @@ class EPI(object):
         if axis == 'v':
             shape = (height, len(indexs), channels)
             line_num = width
-        # png文件后缀
-        png_suffix = '.png'
         # 构建EPI
         for line_index in xrange(line_num):
             epi = np.ndarray(shape)
             cnt = 0
             for image in images:
                 #获得numpy.ndarray类型的data
-                data = image.data_convert3d()
+                data = image.data_up()
                 line = None
                 if axis == 'u':#水平方向上
                     line = data[line_index, :, :]
@@ -66,12 +56,24 @@ class EPI(object):
                     line = data[:, line_index, :]
                     epi[:, cnt, :] = line
                 cnt += 1#cnt自增
-            # 保存epi
-            filename = '{:0>3}'.format(line_index) + png_suffix
-            filename = epi_folder + '/' + filename
+            # 持有EPI
+            self.EPIs.append(epi)
+        print 'done!'
+        return self
+    def save(self, folder, prefix=None, suffix='.png'):
+        '保存EPIs'
+        # 检测是否存在目录，不存在则创建一个
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+        folder += '/'
+        if prefix is not None:
+            folder += prefix + '_'
+        index = 0
+        for epi in self.EPIs:
+            filename = folder + '{:0>3}'.format(index) + suffix
             img = Image.fromarray(np.uint8(epi))
             img.save(filename)
-        print 'done!'
+            index += 1#index自增
 
 class PatchHelper(object):
     def __init__(self, image):
@@ -91,7 +93,7 @@ class PatchHelper(object):
         shape = (h + up + down, w + left + right, c)
         data = np.zeros(shape)#定义shape的ndarray，并用0填充
         #批量赋值
-        data[up:up + h, left:left + w, :] = image.data_convert3d()
+        data[up:up + h, left:left + w, :] = image.data_up()
         #持有数据
         self.__image = ImageHelper(data)
     def extract(self, ksize, stride):
@@ -121,7 +123,7 @@ class PatchHelper(object):
                 #得到卷积右上角W坐标
                 end_w = start[1] + kw
                 if end_w <= width:
-                    patch = self.__image.data_convert3d()[start[0]:end_h, start[1]:end_w, :]
+                    patch = self.__image.data_up()[start[0]:end_h, start[1]:end_w, :]
                     self.__patches.append(patch)
                     start[1] += sw#卷积左上角w坐标右移步长w
                 else:

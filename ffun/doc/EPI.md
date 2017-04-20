@@ -14,8 +14,9 @@ EPI生成器
 files =  FileHelper.get_files('/Users/fang/workspaces/tf_space/box', '.png')
 #创建EPI生成器对象，入参为文件列表的元组
 epi = EPI(files)
-#生成EPI文件，入参分别是图片索引序列(可以是任意的索引序列)、epi方向(u--水平，v--竖直方向)、存放路径
-epi.create(range(36, 45), 'u','/Users/fang/workspaces/tf_space/test/EPI-u')
+#生成EPI文件，入参分别是图片索引序列(可以是任意的索引序列)、epi方向(u--水平，v--竖直方向)
+epi.create(range(36, 45), 'u')
+epi.save('/Users/fang/workspaces/tf_space/test/EPI-u)
 ```  
 上述代码会在`EPI-u`目录下产生000~511.png（假设原始图像height = 512)。EPI对象在creat()的时候，会根据水平或竖直方向、以及图片的长宽，自动计算EPI的尺寸和通道数。  
 
@@ -28,7 +29,7 @@ path = '/Users/fang/workspaces/tf_space/test/EPI-u/000.png'
 #读取图片
 ih = ImageHelper().read(path)
 #创建PathHelper对象，入参是图片的numpy.ndarray类型数据
-ph = PatchHelper(ih.data_convert3d())
+ph = PatchHelper(ih.data_up())
 #设置padding(可选)，入参是4维向量，分别是上、下、左、右的pad数量
 ph.padding([0, 0, 16, 16])
 #提取数据，入参是卷积核，步长。如果图片是(512, 9, 3)(竖着的EPI)
