@@ -41,6 +41,8 @@ class EPI(object):
         if axis == 'v':
             shape = (height, len(indexs), channels)
             line_num = width
+        # 都会舍弃上一次产生的EPI
+        self.EPIs = []#为保证create()对于同一个对象可复用
         # 构建EPI
         for line_index in xrange(line_num):
             epi = np.ndarray(shape)
@@ -60,6 +62,14 @@ class EPI(object):
             self.EPIs.append(epi)
         print 'done!'
         return self
+    def EPIs_data(self):
+        '''
+        拿到EPI数据.便于以图片为单位infer\n
+        Return:
+        numpy.ndarray类型list
+        '''
+        assert len(self.EPIs) != 0
+        return self.EPIs
     def save(self, folder, prefix=None, suffix='.png'):
         '保存EPIs'
         # 检测是否存在目录，不存在则创建一个
@@ -74,6 +84,7 @@ class EPI(object):
             img = Image.fromarray(np.uint8(epi))
             img.save(filename)
             index += 1#index自增
+        return self
 
 class PatchHelper(object):
     def __init__(self, image):

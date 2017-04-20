@@ -40,8 +40,8 @@ def create_epi(src_dir, dst_dir):
     assert len(files) == 81
     epi = EPI(files)
     size = (9, 9)
-    epi.create(row_indexs(size, 4), 'u', dst_dir + '/EPI-u')
-    epi.create(col_indexs(size, 4), 'v', dst_dir + '/EPI-v')
+    epi.create(row_indexs(size, 4), 'u').save(dst_dir + '/EPI-u')
+    epi.create(col_indexs(size, 4), 'v').save(dst_dir + '/EPI-v')
 
 def batch_create(src_dir, dst_dir):
     '对src_dir下的所有文件夹内的数据，都进行EPI生成'
