@@ -2,25 +2,25 @@
 # -*- coding: UTF-8 -*-
 import sys,getopt
 import CFG
-from ffun.EPI import*
+from ffun.EPI import EPI,PatchHelper
 from ffun.DataProvider import DataProvider,BatchHelper
 from ffun.FileHelper import*
-from ffun import LabelHelper
+from ffun.DataUtil import ImageHelper
 import numpy as np
 import tensorflow as tf
 
-def epi_generate():
+def epi_generate(ImgPath):
     '生成单个样本的原始epi文件'
     print 'gengerating EPI Files'
-    files = FileHelper.get_files(CFG.Image_DIR)
-    epi_creator = EPIcreator(files)
-    epi_creator.create((36, 44))
+    files = FileHelper.get_files(ImgPath, 'input')
+    epi = EPI(files)
+    epi.create(range(36, 45), 'u')
 
 def epi_patch_generate():
     '生成用于训练的epi patch'
     pass
 
-def label_trans(x, class_num=58):
+def label_trans(x, class_num=CFG.Class_NUM):
     '标签转换函数:把float转换成int，[0,57]'
     r = (x+2)*class_num/4
     r = int(round(r))#四舍五入后取整
@@ -29,6 +29,11 @@ def label_trans(x, class_num=58):
     elif r < 0:
         r = 0
     return r
+
+def class_trains(y, class_num = CFG.Class_NUM):
+    '类别转换函数：把infer得到的class转换成float以便与label比较'
+    x = y*4.0/class_num - 2
+    return x
 
 #batch-data
 def get_data():
@@ -45,17 +50,14 @@ def get_data():
     print 'load labels done!'
     labels = np.array(labels)#转为numpy.ndarray类型数据
     #得到排序后的图片文件列表
-    #origin_epi_list = Fio.FileHelper.get_files(tdc['origin-epi-dir'])
-    origin_epi_list = FileHelper.get_files(CFG.EPI_DIR)
+    images = FileHelper.get_files(CFG.EPI_DIR)
     epi_list = []
-    for i in xrange(len(origin_epi_list)):
-        Extractor = EPIextractor(origin_epi_list[i])
-        #给原图像加上padding,这样下面我们就可以提取长度为33的
-        Extractor.set_padding(CFG.Input_W)
-        #for j in xrange(img_cfg['width']):
-        for j in xrange(CFG.EPI_W):
-            epi = Extractor.extract(j, CFG.Input_W)
-            epi_list.append(epi)
+    for image in images:
+        ph = PatchHelper(ImageHelper().read(image).data_convert3d())
+        ph.padding([0, 0, 16, 16])
+        ph.extract([9, 33], [1, 1])
+        epi_list.extend(ph.patches())
+    print len(epi_list)
     print 'generate epi done!'
     assert len(labels) == len(epi_list)#check
     print 'generate data done!'
@@ -113,6 +115,31 @@ class DataSource(DataProvider):
         }
         return feed_dict
 
+class TestData(DataSource):
+    '测试数据集提供者'
+    def get_placeholder(self):
+        '获得palceholder'
+        if self.PL_OK:
+            return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
+        H, W, C = CFG.Input_H, CFG.Input_W, CFG.Input_C
+        self.IMAGES_PL = tf.placeholder(tf.float32, shape=(self.batch_size(), H, W, C))
+        #原始数据集，采用tf.float32作为占位符
+        self.LABELS_PL = tf.placeholder(tf.float32, shape=(self.batch_size()))
+        self.KEEP_PROP_PL = tf.placeholder('float')
+        self.PL_OK = True
+        return self.IMAGES_PL, self.LABELS_PL, self.KEEP_PROP_PL
+    def get_feeddict(self):
+        '获得feeddict'
+        self.get_placeholder()
+        prop = 1.0
+        images_feed, labels_feed = self.next_batch()#获得数据
+        feed_dict = {
+            self.IMAGES_PL: images_feed,
+            self.LABELS_PL: labels_feed,
+            self.KEEP_PROP_PL: prop
+        }
+        return feed_dict
+
 
 def usage():
     '使用说明'
@@ -129,7 +156,7 @@ if __name__ == '__main__':
     opts, _ = getopt.getopt(sys.argv[1:], "h", ['epi'])
     for op, value in opts:
         if op == '--epi':
-            epi_generate()
+            epi_generate(CFG.Image_DIR)
         elif op == '-h':
             usage()
     if len(opts) == 0:

@@ -6,15 +6,16 @@
 - Python2.7  
 - Numpy  
 - PIL(for data generation in EPI EPIcreator)
+- opencv
 - [**lightfield-analysis/python-tools**][Python Tool](数据集官方提供的工具)
 
 ## ffun  
 依赖于PIL,numpy,tensorflow等而写的一个python package。  
 相关组件(持续更新中)：  
-- EPIcreator  
+- EPI
 根据数据样本产生原始EPI文件  
-- EPIextractor  
-输入原始EPI文件，提取用于训练特定大小的EPI文件  
+- PatchHelper
+输入图像文件，提取用于训练特定大小的patch文件  
 - BatchHelper  
 支持乱序、next_batch()方法支持循环取数据  
 - NetHelper  
@@ -62,7 +63,7 @@ Epoch_SIZE = 50#一次epoch=所有训练数据forward+backward后更新参数的
 
 - 修改`Model_DIR`的值，它表示训练好的模型要存放在哪个地方。你还可以修改迭代的次数，学习率等等.  
 
-- 生成disp.txt文件(可选)。如有需要，复制`generate_disp.py`脚本到`/python-tool`目录下，修改其中的训练数据目录、disp存放目录2个参数，然后执行`python generate_disp.py`
+- 生成disp.txt文件(可选)。如有需要，复制`LFDL/tool/create_disp.py`脚本到`/python-tool`目录下，修改其中的训练数据目录、disp存放目录2个参数，然后执行`python create_disp.py`
 
 3. 一切就绪  
 运行`python ffunTrain.py`开始训练网络。大致会显示如下信息：

@@ -3,6 +3,7 @@
 '''
 create disp.txt
 author:fang.junpeng
+本文件的执行需要放到LFDL/python-tools目录下
 '''
 import os,os.path
 import file_io
@@ -42,7 +43,7 @@ def write_disp(disparity_map, path):
                 f.write(str(data)+' ')
             f.write('\n')
 
-def generate(data_dir, disp_dir):
+def create_disp(data_dir, disp_dir):
     '''
     生成disp文件:
     - data_dir:训练数据目录
@@ -58,7 +59,7 @@ def generate(data_dir, disp_dir):
         write_disp(disparity_map, disp_path)
 
 if __name__ == '__main__':
-    generate(train_data, disp_dir)
+    create_disp(train_data, disp_dir)
     print 'done!'
 
 

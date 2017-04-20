@@ -7,10 +7,9 @@ file:BatchHelper.py\n
 '''
 
 import random
-from Checker import Checker
 import sys
 from FileHelper import FileHelper,LabelHelper
-import Transer
+from DataUtil import ImageHelper
 
 class BatchHelper(object):
     '''
@@ -31,11 +30,11 @@ class BatchHelper(object):
         数据校验
         '''
         #类型校验
-        Checker.type_check(self.m_items, (list, tuple))
+        assert isinstance(self.m_items, tuple) or isinstance(self.m_items, list)
         #长度校验
         seq_length = len(self.m_items[0])
         for i in xrange(len(self.m_items)):
-            Checker.seq_len_check(self.m_items[i], seq_length)
+            assert len(self.m_items[i]) == seq_length
 
     def shuffle(self, times=1):
         '''
@@ -175,7 +174,7 @@ class DataProvider(object):
             paths, labels = self.BH.next_batch(bz)
             data = []
             for path in paths:
-                data.append(Transer.image2ndarray(path))
+                data.append(ImageHelper().read(path).data_convert3d())
             return BatchHelper((data, labels)).next_batch(bz)
     def num(self):
         '获得所持有的数据个数总数'
