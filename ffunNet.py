@@ -110,7 +110,7 @@ class ffunNet(object):
         eval_info = 'num_examples:%d,correct:%d,precision:%0.04f'
         eval_info = eval_info % (dataset.num(), true_count, precision)
         return eval_info
-    def run_eval_origin_label(self, sess, dataset, ):
+    def run_eval_origin_label(self, sess, dataset):
         '针对原始标签进行准确度计算'
         self.__check()
         step_epochs = dataset.num() // dataset.batch_size()

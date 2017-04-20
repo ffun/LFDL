@@ -4,7 +4,7 @@
 配置文件
 '''
 # file params
-Label_DIR = '/Users/fang/workspaces/tf_space/LFDL/disp.txt'#标签位置
+Label_DIR = '/Users/fang/workspaces/tf_space/box/disp.txt'#标签位置
 Image_DIR = '/Users/fang/workspaces/tf_space/box'#图片位置
 EPI_DIR = '/Users/fang/workspaces/tf_space/box/epi36_44'#EPI图像位置
 Model_DIR = '/Users/fang/workspaces/tf_space/model'#模型位置
