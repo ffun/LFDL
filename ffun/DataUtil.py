@@ -35,7 +35,7 @@ class ImageHelper(object):
         'get data'
         assert self.__data is not None
         return self.__data
-    def data_convert3d(self):
+    def data_up(self):
         '如果图像是灰度图，那么转换成三维形式并返回'
         #灰度图的shape是类似(512,512)的二维形式，需要转化成(512,512,1)的三维形式
         if self.channels() == 1:
@@ -50,7 +50,7 @@ class ImageHelper(object):
         return self.__data
     def save(self, path):
         '保存图像'
-        # check，防止出现灰度图，而且被convert3d后的数据保存，否则会出错
+        # check，防止出现灰度图，而且被up后的数据保存，否则会出错
         if len(self.shape()) == 3:
             assert self.channels() == 3
         img = Image.fromarray(np.uint8(self.data()))
@@ -96,7 +96,7 @@ class ImageCollection(object):
             #更新开始通道和结束通道
             start_ch, end_ch = end_ch, end_ch + image.channels()
             #批量赋值
-            data[:, :, start_ch:end_ch] = image.data_convert3d()[:, :, :]
+            data[:, :, start_ch:end_ch] = image.data_up()[:, :, :]
         return data
     def size(self):
         '集合持有的对象数量'

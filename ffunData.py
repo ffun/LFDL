@@ -15,6 +15,7 @@ def epi_generate(ImgPath):
     files = FileHelper.get_files(ImgPath, 'input')
     epi = EPI(files)
     epi.create(range(36, 45), 'u')
+    epi.save(CFG.EPI_DIR)
 
 def epi_patch_generate():
     '生成用于训练的epi patch'
@@ -53,7 +54,7 @@ def get_data():
     images = FileHelper.get_files(CFG.EPI_DIR, 'png')
     epi_list = []
     for image in images:
-        ph = PatchHelper(ImageHelper().read(image).data_convert3d())
+        ph = PatchHelper(ImageHelper().read(image).data_up())
         ph.padding([0, 0, 16, 16])
         ph.extract([9, 33], [1, 1])
         epi_list.extend(ph.patches())
@@ -161,3 +162,4 @@ if __name__ == '__main__':
             usage()
     if len(opts) == 0:
         usage()
+

@@ -174,7 +174,7 @@ class DataProvider(object):
             paths, labels = self.BH.next_batch(bz)
             data = []
             for path in paths:
-                data.append(ImageHelper().read(path).data_convert3d())
+                data.append(ImageHelper().read(path).data_up())
             return BatchHelper((data, labels)).next_batch(bz)
     def num(self):
         '获得所持有的数据个数总数'
