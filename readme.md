@@ -63,7 +63,7 @@ Epoch_SIZE = 50#一次epoch=所有训练数据forward+backward后更新参数的
 
 - 修改`Model_DIR`的值，它表示训练好的模型要存放在哪个地方。你还可以修改迭代的次数，学习率等等.  
 
-- 生成disp.txt文件(可选)。如有需要，复制`generate_disp.py`脚本到`/python-tool`目录下，修改其中的训练数据目录、disp存放目录2个参数，然后执行`python generate_disp.py`
+- 生成disp.txt文件(可选)。如有需要，复制`LFDL/tool/create_disp.py`脚本到`/python-tool`目录下，修改其中的训练数据目录、disp存放目录2个参数，然后执行`python generate_disp.py`
 
 3. 一切就绪  
 运行`python ffunTrain.py`开始训练网络。大致会显示如下信息：
