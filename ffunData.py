@@ -50,7 +50,7 @@ def get_data():
     print 'load labels done!'
     labels = np.array(labels)#转为numpy.ndarray类型数据
     #得到排序后的图片文件列表
-    images = FileHelper.get_files(CFG.EPI_DIR)
+    images = FileHelper.get_files(CFG.EPI_DIR, 'png')
     epi_list = []
     for image in images:
         ph = PatchHelper(ImageHelper().read(image).data_convert3d())
