@@ -145,13 +145,17 @@ class PatchHelper(object):
         '得到patch'
         assert self.size() > 0
         return self.__patches
-    def save(self, folder):
+    def save(self, folder, prefix='patch', suffix='.png'):
         '保存patch'
         assert self.size() > 0
+        # 如果不存在目录,那么创建一个
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+        folder += '/'+prefix
         cnt = 0
         for patch in self.__patches:
             img = Image.fromarray(np.uint8(patch))
-            filename = folder + '/patch_' + '{:0>3}'.format(cnt) + '.png'
+            filename = folder + '_{:0>6}'.format(cnt) + suffix
             img.save(filename)
     def size(self):
         '获取对象持有的patch数量'

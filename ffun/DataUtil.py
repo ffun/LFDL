@@ -55,6 +55,7 @@ class ImageHelper(object):
             assert self.channels() == 3
         img = Image.fromarray(np.uint8(self.data()))
         img.save(path)
+        return self
     def shape(self):
         '得到shape'
         return self.data().shape

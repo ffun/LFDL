@@ -32,9 +32,9 @@ class BatchHelper(object):
         #类型校验
         assert isinstance(self.m_items, tuple) or isinstance(self.m_items, list)
         #长度校验
-        seq_length = len(self.m_items[0])
-        for i in xrange(len(self.m_items)):
-            assert len(self.m_items[i]) == seq_length
+        Length = len(self.m_items[0])
+        for item in self.m_items:
+            assert len(item) == Length
 
     def shuffle(self, times=1):
         '''
@@ -130,55 +130,53 @@ class BatchHelper(object):
         return tuple(batch)
 
     def num(self):
-        '获得BH所持有的数据个数'
+        '获得BH所持有的数据长度'
         return len(self.index)
     def num_remain(self):
-        '获得BH剩余数据个数:由于BH支持循环读取，所以此值仅代表本轮的remain'
+        '''
+        1. 获得BH剩余数据个数:由于BH支持循环读取，所以此值仅代表本轮的remain
+        2. 该方法的出现是为了对DataProvider的加速化的分步加载机制提供支持
+        '''
         return self.end - self.front
 
 class DataProvider(object):
     'ffun package的数据组件'
-    def __init__(self, bh=None, batch_size=50, mode='once'):
+    def __init__(self, bh, batch_size=50, mode='once'):
         '''
         Input:
         - mode:'once'数据内容一次加载至内存，'part':分步加载至内存
         '''
-        self.BH = bh#所持有的BH，如果是once模式，BH持有数据和标签；否则BH持有数据路径和标签
-        self.BZ = (batch_size,)
+        # check
+        assert isinstance(bh, BatchHelper)
+        self.MAIN_BH = bh#主BatchHelper。如果是once模式，MAIN_BH持有数据和标签；否则,持有数据路径和标签
+        self.FOLLOW_BH = None#从BatchHelper。给加速花分步加载准备
+        self.BATCH_SIZE = (batch_size,)
         self.MODE = (mode,)#使用元组形式存储MODE，防止被修改
-    def load_from_files(self, data_dir, suffix, label_path, transform):
+    def load(self):
         '''
-        加载文件路径和标签数据并封装成BH存储
+        该方法用于派生类自定义分步加载方式:包括策略和数据内容\n
+        return:
+        - BatchHelper实例。且该实例的仅持有一个数据list和一个标签list，且长度为self.BATCH_SIZE
+        - 使用加速化的分步加载机制时，FOLLOW_BH的长度应该为self.BATCH_SIZE的n倍
         '''
-        files = FileHelper.get_files(data_dir, suffix)
-        labels = LabelHelper.read(label_path, transform)
-        assert len(files) == len(labels)
-        self.BH = BatchHelper((files, labels))
-    def load_from_BH(self, bh):
-        '加载BH'
-        if not isinstance(bh, BatchHelper):
-            raise TypeError('bh should be BatchHelper OBJ')
-        self.BH = bh
+        pass
     def next_batch(self):
         'get next batch data'
-        bz = self.BZ[0]
         if self.MODE[0] == 'once':
-            return self.BH.next_batch(bz)
+            return self.MAIN_BH.next_batch(self.batch_size())
         elif self.MODE[0] == 'part':
             '''
-            1.在分布加载模型中，是读取self.BH中存储的文件路径的文件，然后组成新的BH并获取next_batch
+            1.在分步加载模型中，是读取self.BH中存储的文件路径的文件，然后组成新的BH并获取next_batch
             2.默认在part模式，每次加载batch-size个数据，为了加速，其实一次性可以加载bs的n倍数据.
-            但是此时这种情况下，需要让该类持有一个额外的bh临时保存，每次先检查它的num_remain()值，如果为0了，
+            但是此时这种情况下，需要让该类持有一个额外的bh临时保存，每次先检查它的num_remain()值，如果为0，
             再加载一次。同时要考虑好n的大小，让n*bs不大于BH.num()
+            3.分步加载应该使用接口的方式开放出来，因为不同的训练集加载的方式千差万别，比如需要数据叠通道。
+            此处调用load()方法。派生类需要自己实现load()方法
             '''
-            paths, labels = self.BH.next_batch(bz)
-            data = []
-            for path in paths:
-                data.append(ImageHelper().read(path).data_up())
-            return BatchHelper((data, labels)).next_batch(bz)
+            return self.load()
     def num(self):
         '获得所持有的数据个数总数'
-        return self.BH.num()
+        return self.MAIN_BH.num()
     def batch_size(self):
         '获取batch-size的值'
-        return self.BZ[0]
+        return self.BATCH_SIZE[0]
