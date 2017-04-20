@@ -12,7 +12,7 @@ import tensorflow as tf
 def epi_generate(ImgPath):
     '生成单个样本的原始epi文件'
     print 'gengerating EPI Files'
-    files = FileHelper.get_files(ImgPath, '.png')
+    files = FileHelper.get_files(ImgPath, 'input')
     epi = EPI(files)
     epi.create(range(36, 45), 'u')
 

@@ -36,7 +36,7 @@ def create_epi(src_dir, dst_dir):
     assert os.path.exists(src_dir) and os.path.isdir(src_dir)
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
-    files = FileHelper.get_files(src_dir, '.png')
+    files = FileHelper.get_files(src_dir, 'input')
     assert len(files) == 81
     epi = EPI(files)
     size = (9, 9)
@@ -47,11 +47,19 @@ def batch_create(src_dir, dst_dir):
     '对src_dir下的所有文件夹内的数据，都进行EPI生成'
     folders = FileHelper.get_folders(src_dir)
     for folder in folders:
-        epi_path = dst_dir +'/' + folder[folder.rfind('/'):]
+        epi_path = dst_dir + folder[folder.rfind('/'):]
         create_epi(folder, epi_path)
 
-train_data='/home/cs505/workspace/LF_Data/full_data/stratified'
-EPI_dir = '/home/cs505/workspace/LF_Data/EPI/stratified'
+# 1th
+#train_data='/home/cs505/workspace/LF_Data/full_data/stratified'
+#EPI_dir = '/home/cs505/workspace/LF_Data/EPI/stratified'
+# 2th
+#train_data='/home/cs505/workspace/LF_Data/full_data/additional'
+#EPI_dir = '/home/cs505/workspace/LF_Data/EPI/additional'
+
+# 3th
+train_data='/home/cs505/workspace/LF_Data/full_data/training'
+EPI_dir = '/home/cs505/workspace/LF_Data/EPI/training'
 
 if __name__ == '__main__':
     batch_create(train_data, EPI_dir)
