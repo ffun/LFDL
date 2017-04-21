@@ -156,7 +156,7 @@ class DataProvider(object):
         '''
         该方法用于派生类自定义分步加载方式:包括策略和数据内容\n
         return:
-        - BatchHelper实例。且该实例的仅持有一个数据list和一个标签list，且长度为self.BATCH_SIZE
+        - 数据和标签的元组。且该实例的仅持有一个数据list和一个标签list，且长度为self.BATCH_SIZE
         - 使用加速化的分步加载机制时，FOLLOW_BH的长度应该为self.BATCH_SIZE的n倍
         '''
         pass
@@ -173,7 +173,9 @@ class DataProvider(object):
             3.分步加载应该使用接口的方式开放出来，因为不同的训练集加载的方式千差万别，比如需要数据叠通道。
             此处调用load()方法。派生类需要自己实现load()方法
             '''
-            return self.load()
+            data = self.load()
+            assert data is not None
+            return data
     def num(self):
         '获得所持有的数据个数总数'
         return self.MAIN_BH.num()
